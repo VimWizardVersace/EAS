@@ -3,7 +3,7 @@
 # be sure to have beautifulsoup and ffmpeg installed or the script will h8 u
 #
 #
-# main is at line 66
+# main is at line 69
 # -ruru
 
 import os
