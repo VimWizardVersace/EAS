@@ -161,30 +161,28 @@ while True:
 
     files = os.listdir('.')
     for f in files:
+        if f.endswith('.mp4'):
+            i_frames = find_num_frames('I')
+            b_frames = find_num_frames('B')
+            p_frames = find_num_frames('P')
+            ratio = float(b_frames + p_frames) / float(i_frames)
+            info = c.probe(f)
+            size = (str(info.video.video_width) + 'x' +
+                    str(info.video.video_height))
+            original = [info.format.format, info.format.duration,
+                        info.video.video_fps, info.video.codec, size,
+                        info.audio.codec, i_frames, b_frames, p_frames]
+
+        if f.endswith('.m3u8'):
+            info = c.probe(f)
+            size = (str(info.video.video_width) + 'x' +
+                    str(info.video.video_height))
+            output = [info.format.format, info.video.video_fps,
+                      info.video.codec, size, info.audio.codec]
+
+    for f in files:
         if f.endswith('.mp4') or f.endswith('.ts') or f.endswith('.m3u8'):
-            # If the file is an mp4, it is the original, and the data
-            # types regarding the mp4 is done differently than the
-            # newly converted video.
-            if f.endswith('.mp4'):
-                i_frames = find_num_frames('I')
-                b_frames = find_num_frames('B')
-                p_frames = find_num_frames('P')
-                ratio = float(b_frames + p_frames) / float(i_frames)
-                info = c.probe(f)
-                size = (str(info.video.video_width) + 'x' +
-                        str(info.video.video_height))
-                original = [info.format.format, info.format.duration,
-                            info.video.video_fps, info.video.codec, size,
-                            info.audio.codec, i_frames, b_frames, p_frames]
-
-            if f.endswith('.m3u8'):
-                info = c.probe(f)
-                size = (str(info.video.video_width) + 'x' +
-                        str(info.video.video_height))
-                output = [info.format.format, info.video.video_fps,
-                          info.video.codec, size, info.audio.codec]
-
-            # Remove all .mp4, .ts, and .m3u8 files for cleanup
             os.remove(f)
+            
     writer.writerow(original + output + [elapsed_time])
 #######################################################################
