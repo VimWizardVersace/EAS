@@ -64,6 +64,7 @@ def get_random_video(url_list):
             for f in files:
                 if f.endswith('.mkv'):
                     os.remove(f)
+                    raise TypeError
                 if f.endswith('.mp4'):
                     os.rename(f, 'video.mp4')
                     return
