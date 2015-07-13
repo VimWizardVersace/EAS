@@ -164,6 +164,8 @@ while True:
 
     files = os.listdir('.')
     for f in files:
+        # Different information is needed for the mp4 and m3u8 files
+        # so they are handled separately
         if f.endswith('.mp4'):
             i_frames = find_num_frames('I')
             b_frames = find_num_frames('B')
@@ -182,9 +184,10 @@ while True:
             output = [info.format.format, info.video.video_fps,
                       info.video.codec, size, info.audio.codec]
 
+    # Cleanup video files to save disk space
     for f in files:
         if f.endswith('.mp4') or f.endswith('.ts') or f.endswith('.m3u8'):
             os.remove(f)
-            
+
     writer.writerow(original + output + [elapsed_time])
 #######################################################################
