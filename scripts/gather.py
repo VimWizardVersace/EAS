@@ -62,6 +62,8 @@ def get_random_video(url_list):
             ydl.download([url])
             files = os.listdir('.')
             for f in files:
+                if f.endswith('.mkv'):
+                    os.remove(f)
                 if f.endswith('.mp4'):
                     os.rename(f, 'video.mp4')
                     return
