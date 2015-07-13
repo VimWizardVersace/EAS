@@ -64,7 +64,7 @@ def get_random_video(url_list):
             for f in files:
                 if f.endswith('.mp4'):
                     os.rename(f, 'video.mp4')
-            return
+                    return
         except:
             url = random.choice(url_list)
 #######################################################################
@@ -165,7 +165,6 @@ while True:
             i_frames = find_num_frames('I')
             b_frames = find_num_frames('B')
             p_frames = find_num_frames('P')
-            ratio = float(b_frames + p_frames) / float(i_frames)
             info = c.probe(f)
             size = (str(info.video.video_width) + 'x' +
                     str(info.video.video_height))
