@@ -3,6 +3,7 @@ from sklearn import preprocessing
 from sklearn import grid_search
 from sklearn import svm
 import csv
+import os
 
 
 def parse_data(file_name):
@@ -90,8 +91,19 @@ def test_predictor(data, predictor):
     return round(sum(errors) / len(errors))
 
 
+def save_predictor(predictor, save_directory='predictor'):
+    """ Saves a predictor using the in-house scikit pickle module. Also
+    saves method of data normalization, so it can be recreated later
+    """
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
+    joblib.dump(predictor, save_directory + '/predictor.pkl')
+
+
 if __name__ == '__main__':
     data = split_data(parse_data('conversions_total.csv'), 2/3.)
     predictor = train_predictor(data)
-    error = test_predictor(data, predictor)
-    print 'Mean absolute percent error: ' + str(error) + '%'
+    save_predictor(predictor)
+    # error = test_predictor(data, predictor)
+    # print 'Mean absolute percent error: ' + str(error) + '%'
