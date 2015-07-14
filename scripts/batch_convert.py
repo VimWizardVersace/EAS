@@ -1,12 +1,11 @@
 from converter import Converter
 import os
 
-###############################################################################
-# Loop through all files in the search directory, find all the ones that match
-# a given type, and return them in a list
-
 
 def find_matching_files(search_type, search_directory):
+    """ Loop through all files in the search directory, find all the
+    ones that match a given type, and return them in a list
+    """
     to_convert = []
     to_check = os.listdir(search_directory)
 
@@ -17,12 +16,10 @@ def find_matching_files(search_type, search_directory):
             to_convert.append(f)
 
     return to_convert
-###############################################################################
 
 
-###############################################################################
-# Transcode a list of given files
 def transcode(files, config, init_directory, final_directory):
+    """ Transcode a list of given files """
     for name in files:
         attributes = name.split('.')
         form_type = config['format']
@@ -35,12 +32,9 @@ def transcode(files, config, init_directory, final_directory):
         transcode_file(config, initial, final)
         print ''
 
-###############################################################################
 
-
-###############################################################################
-# Transcodes individual file
 def transcode_file(config, initial, final):
+    """ Transcodes individual file """
     c = Converter()
     c_generator = c.convert(initial, final, config)
 
@@ -51,17 +45,12 @@ def transcode_file(config, initial, final):
             percents.append(p)
             p += 10
             print str(p) + '% done'
-###############################################################################
 
 
 if __name__ == '__main__':
-    # Type of file to be converted
     file_type = 'mkv'
 
-    # Directory of files to be converted
     init_directory = 'to_convert/'
-
-    # Directory converted files should be placed
     final_directory = 'converted/'
 
     # Dictionary of options which are passed onto FFmpeg
