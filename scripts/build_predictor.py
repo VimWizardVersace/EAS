@@ -101,6 +101,15 @@ def save_predictor(predictor, save_directory='predictor'):
     joblib.dump(predictor, save_directory + '/predictor.pkl')
 
 
+def load_predictor(predictor, load_directory='predictor'):
+    """
+    """
+    if not os.path.exists(save_directory):
+        raise IOError('No predictor module found')
+
+    predictor = joblib.load(load_directory + '/predictor.pkl')
+
+
 if __name__ == '__main__':
     data = split_data(parse_data('conversions_total.csv'), 2/3.)
     predictor = train_predictor(data)
