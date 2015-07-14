@@ -6,7 +6,7 @@ import csv
 import os
 
 
-def parse_data(file_name, save_scaler=True):
+def parse_data(file_name):
     """ Parse csv conversion data, assuming it is in the same format
     given by  gather.py, and assuming that the codecs in question are
     not relevant (in other words, that the conversions are always done
@@ -29,11 +29,15 @@ def parse_data(file_name, save_scaler=True):
         X.append(data_vec)
         T.append(float(row[14]))
 
+    return (X, T)
+
+
+def scale_data((X, T), save_scaler=True):
     scaler = preprocessing.StandardScaler().fit(X)
     X_scaled = scaler.transform(X)
 
     if save_scaler:
-        joblib.dump(scaler, 'scaler/scaler.pkl')    
+        joblib.dump(scaler, 'scaler/scaler.pkl')
 
     return (X_scaled, T), scaler
 
@@ -82,11 +86,14 @@ def train_predictor(data):
     return predictor
 
 
-def test_predictor(data, predictor):
+def test_predictor(data, predictor=None):
     """ Goes through all the testing data, and returns the mean
     absolute percent error based off the predicted and actual transcode
     times
     """
+    if not predictor:
+        predictor = load_predictor()
+
     errors = []
 
     for i, vec in enumerate(data['X']['testing']):
@@ -97,28 +104,53 @@ def test_predictor(data, predictor):
     return round(sum(errors) / len(errors))
 
 
-def save_predictor(predictor, save_directory='predictor'):
+def save_predictor(predictor):
     """ Saves a predictor using the in-house scikit pickle module. Also
     saves method of data normalization, so it can be recreated later
     """
+    save_directory = 'predictor'
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
     joblib.dump(predictor, save_directory + '/predictor.pkl')
 
 
-def load_predictor(load_directory='predictor'):
-    """
-    """
+def load_predictor():
+    """ Load and return predictor module """
+    load_directory = 'predictor'
+
     if not os.path.exists(load_directory):
         raise IOError('No predictor module found')
 
     return joblib.load(load_directory + '/predictor.pkl')
 
 
+def load_scaler():
+    """ Load and return scaler module """
+    load_directory = 'scaler'
+
+    if not os.path.exists(load_directory):
+        raise IOError('No scaler module found')
+
+    return joblib.load(load_directory + '/scaler.pkl')
+
+
+def predict(vec, predictor=None, scaler=None):
+    if not scaler:
+        scaler = load_scaler()
+    if not predictor:
+        predictor = load_predictor()
+
+    scaled_vec = scaler.transform([vec])[0]
+    return predictor.predict(scaled_vec)[0]
+
+
 if __name__ == '__main__':
-    unsplit_data, scaler = parse_data('conversions_total.csv')
-    data = split_data(unsplit_data, 2/3.)
-    predictor = train_predictor(data)
-    error = test_predictor(data, predictor)
-    print 'Mean absolute percent error: ' + str(error) + '%'
+    raw_data = parse_data('conversions_total.csv')
+    scaled_data, scaler = scale_data(raw_data)
+    final_data = split_data(scaled_data, 2/3.)
+
+    predictor = train_predictor(final_data)
+    error = test_predictor(final_data, predictor)
+    test_vec = raw[0][0]
+    prediction = predict(test_vec)
