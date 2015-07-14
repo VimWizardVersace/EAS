@@ -9,7 +9,6 @@ import csv
 import os
 
 
-#######################################################################
 def get_data(file_name):
     """ Read data from file and return it in a list """
     data_file = open(file_name)
@@ -18,10 +17,8 @@ def get_data(file_name):
     for line in data_file.readlines():
         data.append(line)
     return data
-#######################################################################
 
 
-#######################################################################
 def random_config(options):
     """ From a list of possible options, create and return a dictionary
     which is a random configuration for ffmpeg
@@ -45,10 +42,8 @@ def random_config(options):
         }
     }
     return config
-#######################################################################
 
 
-#######################################################################
 def get_random_video(url_list):
     """ Continuously tries to download a youtube video from a list of
     random possible videos until one is finally found, then this is
@@ -70,10 +65,8 @@ def get_random_video(url_list):
                     return
         except:
             url = random.choice(url_list)
-#######################################################################
 
 
-#######################################################################
 def find_num_frames(pict_type):
     """Find and return the number of frames of a given type
     Valid pict_type's are 'I', 'P', and 'B'.
@@ -82,10 +75,8 @@ def find_num_frames(pict_type):
                'grep pict_type=' + pict_type + ' | wc -l')
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     return int(process.stdout.read())
-#######################################################################
 
 
-#######################################################################
 def convert(file_name, config):
     """ Using python-vide-converter as an ffmpeg wrapper, convert a
         given file to match the given config.
@@ -123,11 +114,8 @@ def convert(file_name, config):
     t = time.time() - t0
     print 'Finished transcode in', t, 'seconds'
     return t
-#######################################################################
 
 
-# BEGIN MAIN #
-#######################################################################
 # Create the default name used throughout the program structure. Done
 # to avoid issues with modules not conforming to unicode, which many
 # youtubes use
