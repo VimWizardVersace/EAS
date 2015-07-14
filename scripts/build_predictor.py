@@ -6,7 +6,7 @@ import csv
 import os
 
 
-def parse_data(file_name):
+def parse_data(file_name, save_scaler=True):
     """ Parse csv conversion data, assuming it is in the same format
     given by  gather.py, and assuming that the codecs in question are
     not relevant (in other words, that the conversions are always done
@@ -28,8 +28,14 @@ def parse_data(file_name):
                     float(out_resolution[1])]
         X.append(data_vec)
         T.append(float(row[14]))
-    X_scaled = preprocessing.scale(X)
-    return X_scaled, T
+
+    scaler = preprocessing.StandardScaler().fit(X)
+    X_scaled = scaler.transform(X)
+
+    if save_scaler:
+        joblib.dump(scaler, 'scaler/scaler.pkl')    
+
+    return (X_scaled, T), scaler
 
 
 def split_data((X, T), split_fraction):
@@ -101,18 +107,18 @@ def save_predictor(predictor, save_directory='predictor'):
     joblib.dump(predictor, save_directory + '/predictor.pkl')
 
 
-def load_predictor(predictor, load_directory='predictor'):
+def load_predictor(load_directory='predictor'):
     """
     """
-    if not os.path.exists(save_directory):
+    if not os.path.exists(load_directory):
         raise IOError('No predictor module found')
 
-    predictor = joblib.load(load_directory + '/predictor.pkl')
+    return joblib.load(load_directory + '/predictor.pkl')
 
 
 if __name__ == '__main__':
-    data = split_data(parse_data('conversions_total.csv'), 2/3.)
+    unsplit_data, scaler = parse_data('conversions_total.csv')
+    data = split_data(unsplit_data, 2/3.)
     predictor = train_predictor(data)
-    save_predictor(predictor)
-    # error = test_predictor(data, predictor)
-    # print 'Mean absolute percent error: ' + str(error) + '%'
+    error = test_predictor(data, predictor)
+    print 'Mean absolute percent error: ' + str(error) + '%'
