@@ -152,5 +152,6 @@ if __name__ == '__main__':
 
     predictor = train_predictor(final_data)
     error = test_predictor(final_data, predictor)
+
     test_vec = raw[0][0]
     prediction = predict(test_vec)
