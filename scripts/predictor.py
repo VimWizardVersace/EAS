@@ -33,6 +33,9 @@ def parse_data(file_name):
 
 
 def scale_data((X, T), save_scaler=True):
+    """ Scale data, save scaler object if requested, and return the 
+    scaler so future data can be scaled in the same manner
+    """
     scaler = preprocessing.StandardScaler().fit(X)
     X_scaled = scaler.transform(X)
 
@@ -136,6 +139,10 @@ def load_scaler():
 
 
 def predict(vec, predictor=None, scaler=None):
+    """ Makes a prediction of based off unscaled data passed to the 
+    function, loading the predictor and scaler from files if none are
+    passed to the function
+    """
     if not scaler:
         scaler = load_scaler()
     if not predictor:
@@ -145,6 +152,7 @@ def predict(vec, predictor=None, scaler=None):
     return predictor.predict(scaled_vec)[0]
 
 
+# Just does some basic testing to show how to use functions
 if __name__ == '__main__':
     raw_data = parse_data('conversions_total.csv')
     scaled_data, scaler = scale_data(raw_data)
