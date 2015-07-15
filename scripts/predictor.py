@@ -32,15 +32,15 @@ def parse_data(file_name):
     return (X, T)
 
 
-def scale_data((X, T), save_scaler=True):
-    """ Scale data, save scaler object if requested, and return the 
+def scale_data((X, T), save=True):
+    """ Scale data, save scaler object if requested, and return the
     scaler so future data can be scaled in the same manner
     """
     scaler = preprocessing.StandardScaler().fit(X)
     X_scaled = scaler.transform(X)
 
-    if save_scaler:
-        joblib.dump(scaler, 'scaler/scaler.pkl')
+    if save:
+        save_scaler(scaler)
 
     return (X_scaled, T), scaler
 
@@ -71,7 +71,7 @@ def split_data((X, T), split_fraction):
     return data
 
 
-def train_predictor(data):
+def train_predictor(data, save=True):
     """ Does a grid search over the data to find the best parameters
     for the support vector regression, then fits the machine to the
     training data, and returns the predictor object
@@ -85,6 +85,9 @@ def train_predictor(data):
     svr = svm.SVR()
     predictor = grid_search.GridSearchCV(svr, param_grid)
     predictor.fit(data['X']['training'], data['T']['training'])
+
+    if save:
+        save_predictor(predictor)
 
     return predictor
 
@@ -128,6 +131,17 @@ def load_predictor():
     return joblib.load(load_directory + '/predictor.pkl')
 
 
+def save_scaler(scaler):
+    """ Saves a predictor using the in-house scikit pickle module. Also
+    saves method of data normalization, so it can be recreated later
+    """
+    save_directory = 'scaler'
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
+    joblib.dump(scaler, save_directory + '/scaler.pkl')
+
+
 def load_scaler():
     """ Load and return scaler module """
     load_directory = 'scaler'
@@ -139,7 +153,7 @@ def load_scaler():
 
 
 def predict(vec, predictor=None, scaler=None):
-    """ Makes a prediction of based off unscaled data passed to the 
+    """ Makes a prediction of based off unscaled data passed to the
     function, loading the predictor and scaler from files if none are
     passed to the function
     """
@@ -159,7 +173,7 @@ if __name__ == '__main__':
     final_data = split_data(scaled_data, 2/3.)
 
     predictor = train_predictor(final_data)
-    error = test_predictor(final_data, predictor)
+    error = test_predictor(final_data)
 
-    test_vec = raw[0][0]
+    test_vec = raw_data[0][0]
     prediction = predict(test_vec)
