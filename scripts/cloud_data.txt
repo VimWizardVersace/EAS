@@ -1,0 +1,52 @@
+
+#MAME 						#PRICE 		#CORES 	#GHz   #RAM(GB) 	#STORAGE(GB) 
+
+###CLOUDSIGMA:
+CloudSigma 					$0.01875 	1 		2.4    1 		    1
+
+
+###MICROSOFT:
+MicrosoftAzureD1			$0.318 		1 		? 					50
+MicrosoftAzureD2			$0.636 		2 		? 					100
+MicrosoftAzureD3			$1.272 		4 		? 					200
+MicrosoftAzureD4			$2.636 		8 		? 					400
+MicrosoftAzureD14  			$4.744 		16 		? 					800
+
+###AMAZON:
+Amazon(T2.Micro)			$0.013 		1 		?	   1			0
+Amazon(T2.Medium)			$0.052		2 			   4 			0
+Amazon(M4.XLarge)			$0.252		4		2.4    16 			0
+Amazon(M4.2xLarge)			$0.504		8 		2.4	   32			0
+Amazon(M4.4xLarge)			$1.008		16 		2.4    64 			0
+Amazon(M3.Medium)			$0.067		1 		2.4    3.75 		4
+Amazon(M3.Large)			$0.133		2 		2.4    7.5 			32
+Amazon(M3.xLarge)			$0.266		4 		2.4    15 			80
+Amazon(m3.2xLarge)			$0.532		8 		2.4    30 			160
+Amazon(c3.Large)			$0.105		2 		2.8    3.75 		32
+Amazon(c3.xLarge)			$0.21 		4 		2.8    7.5 			80
+Amazon(c3.2xLarge)			$0.42 		8 		2.8    15 			160
+Amazon(c3.4xLarge)			$0.84 		16 		2.8    30 			320
+Amazon(c3.8xLarge)			$1.68 		32 		2.8    60 			640
+Amazon(i2.xLarge)			$0.853 		4 		? 	   30.5 		800
+Amazon(i2.2xLarge)			$1.705 		8 		? 	   61 			1600
+Amazon(i2.4xLarge)			$3.41 		16 		? 	   122 			3200
+Amazon(i2.8xlarge)			$6.82 		32 		? 	   244 			6400
+Amazon(d2.xLarge)			$0.69 		4 		? 	   30.5 		6000
+Amazon(d2.2xLarge)			$1.38 		4 		? 	   61 			12000
+Amazon(d2.4xlarge)			$3.41 		16 		? 	   122 			24000
+Amazon(d2.4xlarge)			$3.41 		36 		? 	   244 			48000
+
+###RACKSPACE
+I/O1-15						$
+
+
+###IWEB:
+iweb50GB(1GB-RAM/1CPU)		$0.06 		1 		?		1 			50
+1web50GB(4GB-RAM/4CPU)		$0.16 		4 		?		4 			50
+iweb50GB(8GB-RAM/8CPUs)		$0.29 		8 		?		8 			50
+iweb100GB(1GB-RAM/1CPUs)	$0.08 		1 		?		1 			100
+iweb100GB(4gb-RAM/4CPUs)	$0.18 		4 		?		4 			100
+iweb100GB(8GB-RAM/8CPUs)	$0.31 		8 		?		8 			100
+iweb250GB(1GB-RAM/1CPUs)	$0.14 		1 		?		1 			250
+iweb250GB(4gb-RAM/4CPUs)	$0.24 		4 		?		4 			250
+iweb250GB(8GB-RAM/8CPUs)	$0.37 		8 		?		8 			250						
