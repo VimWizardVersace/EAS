@@ -7,23 +7,6 @@ from novaclient import client
 from keystoneclient import session
 from keystoneclient.auth.identity import v2
 from glanceclient import Client
-# using glance, upload a new image to the cloud (this is assuming it already isn't there [it should already be there])
-#
-def upload_new_image(Glance_Client, ImageLoc, Local=True):
-	
-	if Local:
-		
-		new_image = Glance_Client.images.create(name="TransBurst", disk_format="raw",
-										 container_format="bare", is_public=True)
-
-		new_image.update(data=open(ImageLoc,'rb'))
-		
-		return new_image
-
-
-	else:
-		"ayylmao"
-
 # after the image is uploaded, you will need to boot it with nova
 # first create a nova servergroup
 # load the image into the server
