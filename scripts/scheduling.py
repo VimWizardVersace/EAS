@@ -25,10 +25,6 @@ def partition_workload(time_until_deadline, bitrate, swiftclient, container_name
 	container_data = [token.split('\t') for token in container_data]
 	print container_data
 
-	# get rid of garbage
-	#
-
-
 	# use a dictionary comprehension to assemble a size: filename map
 	#
 	file_size_dict = dict()
