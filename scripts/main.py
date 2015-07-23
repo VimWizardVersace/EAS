@@ -8,7 +8,7 @@ import movedata
 
 test_conversion_rate = 100
 
-test_deadline = "07/23/15 14:30:00"
+test_deadline = "07/23/2015 15:10:00"
 
 list_of_test_files = ['/Users/rumadera/projects/EAS/scripts/vids/1.mp4',
 					'/Users/rumadera/projects/EAS/scripts/vids/2.mp4',
@@ -16,7 +16,7 @@ list_of_test_files = ['/Users/rumadera/projects/EAS/scripts/vids/1.mp4',
 					'/Users/rumadera/projects/EAS/scripts/vids/4.mp4',
 					'/Users/rumadera/projects/EAS/scripts/vids/5.mp4.mkv']
 
-test_remote_credentials = {"OS_AUTH_URL": "OS_USERNAME": ,"OS_PASSWORD": ,"OS_TENANT_NAME:" ,"OS_REGION_NAME:"}
+#test_remote_credentials = {"OS_AUTH_URL": "OS_USERNAME": ,"OS_PASSWORD": ,"OS_TENANT_NAME:" ,"OS_REGION_NAME:"}
 
 def parse_config_file(fp):
 	file_data = fp.read().split('\n')
@@ -53,7 +53,7 @@ def parse_config_file(fp):
 if __name__ == "__main__":
 	file_pointer = open("transburst.conf", 'r')
 	credentials = parse_config_file(file_pointer)
-	print credentials
+	print "Logging in to "+credentials["OS_AUTH_URL"]+" as "+credentials["OS_USERNAME"]+"..."
 
 	ksclient = client_create.create_keystone_client(credentials)
 	glclient = client_create.create_glance_client(ksclient)
@@ -66,8 +66,8 @@ if __name__ == "__main__":
 	movedata.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
 
 	"""Determine what can be done in the alloted time"""
-	deadline = scheduling.find_epochtime_until_deadline(test_deadline)
-	work_load_to_outsource = scheduling.partition_workload(deadline, test_conversion_rate, swclient, "Videos")
+	time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
+	work_load_to_outsource = scheduling.partition_workload(time_remaining, test_conversion_rate, swclient, "Videos")
 
 	"""Given a deadline, workload, and a collection of data, determine which cloud to outsource to"""
 	# remote_credentials = find_optimal_cloud(deadline, work_load_to_outsource)
@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
 	"""Start up the image on the remote cloud"""
 	remote_image = image.upload_image.upload(remote_glclient, remote_ksclient)
-	worker_node_init.activate_image(remote_nvclient, image.id, "Remote Transburt Server Group", Flavor=0)
+	#worker_node_init.activate_image(remote_nvclient, image.id, "Remote Transburt Server Group", Flavor=0)
 
 	"""Begin transcoding work on remote cloud"""
 	#???

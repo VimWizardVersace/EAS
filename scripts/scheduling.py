@@ -3,41 +3,42 @@ import operator
 import paramiko
 from subprocess import call, PIPE, Popen, check_output
 
-def find_time_until_deadline(deadline):
+def find_epoch_time_until_deadline(deadline):
 	#WARNING:  Time must be formatted the same as pattern
 	#
 	try:
 		pattern = "%m/%d/%Y %H:%M:%S"
 		epoch = int(time.mktime(time.strptime(deadline, pattern)))	
+		return epoch - time.time()
 	except (ValueError):
 		print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
-	return epoch - time.time()
 
-def partition_workload(deadline, bitrate, URL, AUTH):
+def partition_workload(time_until_deadline, bitrate, swiftclient, container_name):
 	# use curl to connect to the object storage
 	# to discover the sizes of the videos to xcode
 	# 
 	# note: authtoken may randomly change???
 
-	stdout = check_output(["curl", URL+"?format=json", "-X", "GET", "-H" , "X-Auth-Token:"+AUTH])
-	json_objs = stdout.split('{')
-	json_objs = [token.split(' ') for token in json_objs]
+	container_data = []
+	for data in swiftclient.get_container(container_name)[1]:
+		container_data.append('{0}\t{1}'.format(data['name'], data['bytes']))
+	container_data = [token.split('\t') for token in container_data]
+	print container_data
 
 	# get rid of garbage
 	#
-	del json_objs[0]
-	
+
+
 	# use a dictionary comprehension to assemble a size: filename map
 	#
 	file_size_dict = dict()
 	try:
-		file_size_dict = {token[7] : int(token[5].strip(",")) for token in json_objs}
+		file_size_dict = {token[0] : (int(token[1])/1024) for token in container_data}
 	except IndexError:
 		print "error (IndexError):  tried to ls on the local cloud to get file sizes.  things are formatted weird."
 
 	# create some important time variables and counters
 	#
-	time_until_deadline = find_time_until_deadline(deadline)
 	total_possible_xcodable_content = time_until_deadline*bitrate
 	total_xcodable = 0
 	
