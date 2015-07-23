@@ -3,17 +3,21 @@ from swiftclient import client
 
 #Move_data_to_local_cloud is used for testing, putting data on our cloud.
 #
-def Move_data_to_local_cloud(ListOfFiles):
+def Move_data_to_local_cloud(swift_client, ListOfFiles, container="videos"):
+	swift_client.put_container(container)
+	print "\"Videos\" container created"
 	for clip in ListOfFiles:
-		subprocess.call(["Swift upload videos "+clip])
+		print clip
+		with open(clip, "rb") as f:
+			swift_client.put_object(container, clip, contents=f, content_type="video")
+	print "Done uploading to LOCAL cloud..."
 
 # Move_data_from_local_cloud_OPENSTACK is the function we run on the local cloud 
 # to move data from our cisco cloud to some remote cloud running openstack
 # Note, we must be supplied with the appropriate authentication of the cloud to work
 #
-def Move_data_to_remote_cloud_OPENSTACK(ListOfFiles, OS_AUTH_URL, OS_USERNAME, OS_PASSWORD):
-	for clip in ListOfFiles:
-		subprocess.call(["Swift --os_auth_url %s --os_username %s --os_password %s upload videos %s" %(OS_AUTH_URL, OS_USERNAME, OS_PASSWORD, clip)])
+def Move_data_to_remote_cloud_OPENSTACK(ListOfFiles, swift_client, remote_swift_client):
+	"give me a moment"
 
 if __name__ == "__main__":
 	ListOfFiles = check_output(["ls"]).split('\n')

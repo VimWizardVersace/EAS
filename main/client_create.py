@@ -16,12 +16,13 @@ def create_keystone_client(credentials):
 	                           tenant_name=credentials["OS_TENANT_NAME"],
 	                           region_name=credentials["OS_REGION_NAME"])
 	try:
+		keystone.auth_token
 		return keystone
 	except:
 		print "KEYSTONE AUTHENTICATION FAILURE.  Check config file."
 
 def create_nova_client(credentials):
-	auth = v2.password(	auth_url=credentials["OS_AUTH_URL"],
+	auth = v2.Password(	auth_url=credentials["OS_AUTH_URL"],
 						username=credentials["OS_USERNAME"],
 	                    password=credentials["OS_PASSWORD"],
 	                    tenant_name=credentials["OS_TENANT_NAME"])
@@ -30,6 +31,7 @@ def create_nova_client(credentials):
 	nova = client.Client("2", session=sess)
 	return nova
 
+#Note: A swift endpoint is required for creating a swift client
 def create_swift_client(credentials):
 	swift = Connection(user=credentials["OS_USERNAME"],
 						key=credentials["OS_PASSWORD"],
