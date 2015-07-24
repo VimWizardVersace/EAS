@@ -1,4 +1,5 @@
 # main.py
+import thread
 
 import client_create
 import upload_image
@@ -62,8 +63,17 @@ if __name__ == "__main__":
 
 	##### IMPORTANT STUFF: #####
 
+	#####################################################
+
+	# FUNCTIONS THAT ARE COMMENTED OUT ARE NOT COMPLETE #
+
+	#####################################################
+
 	"""For testing purposes, move a couple of test videos to our local cloud before doing anything"""
 	movedata.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
+
+	"""Find transcode rate of local cloud"""
+	#xcode_rate = find_xcode_rate()
 
 	"""Determine what can be done in the alloted time"""
 	time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
@@ -81,7 +91,7 @@ if __name__ == "__main__":
 	remote_swclient = client_create.create_swift_client(remote_credentials)
 
 	"""Using that cloud's api, move the video files to that cloud"""
-	# move_data.Move_data_to_remote_cloud(swclient, remote_swclient, work_load_to_outsource)
+	# move_data.Move_data_to_remote_cloud_OPENSTACK(swclient, remote_swclient, work_load_to_outsource)
 
 	"""Start up the image on our local cloud"""
 	image = upload_image.upload(glclient, ksclient)
@@ -92,11 +102,11 @@ if __name__ == "__main__":
 
 	"""Start up the image on the remote cloud"""
 	remote_image = image.upload_image.upload(remote_glclient, remote_ksclient)
-	#worker_node_init.activate_image(remote_nvclient, image.id, "Remote Transburt Server Group", Flavor=0)
+	worker_node_init.activate_image(remote_nvclient, image.id, "Remote Transburt Server Group", Flavor=0)
 
 	"""Begin transcoding work on remote cloud"""
 	#???
 
 	"""Retrieve data from remote cloud"""
-
+	#???
 
