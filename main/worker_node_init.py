@@ -11,26 +11,26 @@ from glanceclient import Client
 # first create a nova servergroup
 # load the image into the server
 #
-def activate_image(Nova_Client, ImageID, ServerName="myserver", Flavor=2):
-	nova_client.servers.create(ServerName, ImageID, Flavor)
-	nova_client.servers.start(ServerName)
+def activate_image(nova_Client, ImageID, ServerName="myserver", Flavor=2):
+    nova_client.servers.create(ServerName, ImageID, Flavor)
+    nova_client.servers.start(ServerName)
 
 
 # main is used for testing
 #
 if __name__ == "__main__":
 
-	auth = v2.Password(auth_url="http://10.0.2.15:35357/v2.0", username="admin", password="light", tenant_name="admin")
+    auth = v2.Password(auth_url="http://10.0.2.15:35357/v2.0", username="admin", password="light", tenant_name="admin")
 
-	sess = session.Session(auth=auth)
+    sess = session.Session(auth=auth)
 
-	nova_client = client.Client("2.26.0", session=sess)
+    nova_client = client.Client("2.26.0", session=sess)
 
-	# NOTE: try the swift auth token
-	# can be found via command "swift stat -v"
+    # NOTE: try the swift auth token
+    # can be found via command "swift stat -v"
 
-	glance_client = Client('1', endpoint="http://10.131.69.112:9292", token="8520212cd1a34b39b0e9d8d475144abb")
+    glance_client = Client('1', endpoint="http://10.131.69.112:9292", token="8520212cd1a34b39b0e9d8d475144abb")
 
-	image = upload_new_image(glance_client, "gather.raw", True)
-	activate_image(nova_client, image.id, "test server", 2)
+    image = upload_new_image(glance_client, "gather.raw", True)
+    activate_image(nova_client, image.id, "test server", 2)
 
