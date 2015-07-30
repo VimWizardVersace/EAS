@@ -3,14 +3,14 @@ import glanceclient.v2.client as glclient
 
 
 # Note: be sure an accessuble glance public endpoint is available or this would time out
-def upload(glance_client, keystone_client):
-    glance_endpoint = keystone_client.service_catalog.url_for(service_type='image')
+def upload(glance_client, keystone_client, img_list):
     image = glance_client.images.create(name="raw_convert", disk_format='raw',
                              container_format='bare')
 
     print 'Beginning upload of image'
     glance_client.images.upload(image.id, open('/Users/rumadera/projects/EAS/scripts/gather.raw', 'rb'))
     print 'Finished uploading of image'
+    img_list.append(image)
     return image
 
 if __name__ == "__main__":

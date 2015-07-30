@@ -114,7 +114,7 @@ if __name__ == "__main__":
     worker_node_init.activate_image(nvclient, images[0].id, "Transburst Server Group", Flavor=0 , Userdata=None)
 
     remote_thread.join()
-    worker_node_init.activate_image(remote_nvclient, images[1].id, "Remote Transburt Server Group", Flavor=0, Userdata="remote_script.py")
+    worker_node_init.activate_image(remote_nvclient, images[1].id, "Remote Transburt Server Group", Flavor=0, userdata="remote_script.py")
     """Begin transcoding work on local cloud"""
     #???
 
