@@ -1,7 +1,6 @@
 # this is a script that will run on the remote server immediately on start up
 # the purpose of this script is to retrieve the video files from the local object-store
-
-from swift import Connection
+from swiftclient import Connection
 
 swclient = Connection(user="admin",
                       key="light",
