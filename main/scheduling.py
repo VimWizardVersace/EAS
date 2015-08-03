@@ -1,6 +1,7 @@
 import time
 import operator
 import paramiko
+import predictor
 from subprocess import call, PIPE, Popen, check_output
 
 def find_epoch_time_until_deadline(deadline):
@@ -16,60 +17,53 @@ def find_epoch_time_until_deadline(deadline):
 def partition_workload(time_until_deadline, bitrate, swiftclient, container_name):
     # use curl to connect to the object storage
     # to discover the sizes of the videos to xcode
-    # 
-    # note: authtoken may randomly change???
 
     container_data = []
     for data in swiftclient.get_container(container_name)[1]:
         container_data.append('{0}\t{1}'.format(data['name'], data['bytes']))
     container_data = [token.split('\t') for token in container_data]
 
-    # use a dictionary comprehension to assemble a size: filename map
+    # get_auth() returns the storage_url and auth_token associated with that account, this
+    # would make it easy for joe's indexing thing to find and gain access to the files it
+    # needs to look up
     #
-    file_size_dict = dict()
+    storage_url, auth_token = swiftclient.get_auth()
+    storage_url = storage_url.encode('ascii')
+    auth_token = auth_token.encode('ascii')
+
+    # use a dictionary comprehension to assemble a filename:size map
+    #
+    file_list = []
     try:
-        file_size_dict = {token[0] : (int(token[1])/1024) for token in container_data}
+        file_list = [token[0] for token in container_data]
     except IndexError:
-        print "error (IndexError):  tried to ls on the local cloud to get file sizes.  things are formatted weird."
-
-    # create some important time variables and counters
-    #
-    total_possible_xcodable_content = time_until_deadline*bitrate
-    total_xcodable = 0
+        print "error (IndexError): container empty?"
     
-    # where we store the videos in either local or external
+    # where we store the videos. Internal lists seperated by what is possible to transcode in time on one VM
     #
-    video_names_local = []
-    video_names_outsourced = []
+    partitioned_video_list = []
 
-    # given the bitrate, find how much xcoding is possible on local machine
+    # given a time-until-completetion by joe's look up table, keep decrementing "time_until_deadline" by 
+    # these times until it reaches zero, then, create a new list (representing a new vm), and repeat. 
     #
-    for video in file_size_dict:
-        if (total_xcodable + file_size_dict[video] < total_possible_xcodable_content):
-            video_names_local.append(video)
-            total_xcodable += file_size_dict[video]
+    tmp_t_u_d = time_until_deadline
+    single_vm_capacity = []
+    for video in file_list:
+        prediction_time = predictor.predict(storage_url+"/"+container_name+"/"+video)
+
+        if (prediction_time > time_until_deadline):
+            raise Exception("One of the files is too big to be transcoded by a VM in time.  Maybe cut it up into chunks and reupload it.")
+        
+        elif (tmp_t_u_d - prediction_time > 0):
+            single_vm_capacity.append(video)
+            tmp_t_u_d -= prediction_time
+        
         else:
-            video_names_outsourced.append(video)
+            tmp_t_u_d = time_until_deadline
+            partitioned_video_list.append(single_vm_capacity)
+            single_vm_capacity = []
 
-    return (video_names_local, video_names_outsourced)
-
-#main is used for testing
-#
-if __name__ == "__main__":
-    # This file takes in urls in the form of a list
-    # URL[0] = IP of VM
-    # URL[1] = port #
-    # URL[2] = username for VM
-    # URL[3] = password for VM
-    # This is neccesary to ssh into it and find their file sizes
-
-    test_url = "http://10.131.69.121:8080/v1/AUTH_1eacdf40e54e4d72b1b1096e82d3bbe3/videos"
-    test_auth = "255d997d9321454fa3e2d454dc641cb1"
-    test_deadline = '07/15/2015 16:10:09'
-    test_bitrate = 1024 * 0
-    partition_workload(test_deadline, test_bitrate, test_url, test_auth)
-    #stdout = check_output(["curl", test_url+"?format=json", "-X", "GET", "-H" , "X-Auth-Token:"+test_auth])
-    #print stdout
+    return partitioned_video_list
 
 
 
