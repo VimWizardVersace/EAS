@@ -1,4 +1,15 @@
+import subprocess
 import os
+
+
+def find_num_frames(pict_type):
+    """Find and return the number of frames of a given type
+    Valid pict_type's are 'I', 'P', and 'B'.
+    """
+    command = ('ffprobe -loglevel quiet -show_frames video.mp4 | ' +
+               'grep pict_type=' + pict_type + ' | wc -l')
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+    return int(process.stdout.read())
 
 
 def ingest(path):
