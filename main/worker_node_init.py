@@ -13,8 +13,8 @@ from glanceclient import Client
 #
 def activate_image(nova_client, ImageID, ServerName="myserver", Flavor=4, userdata=None):
     print "Booting server..."
-    nova_client.servers.create(ServerName, ImageID, Flavor)
-    nova_client.servers.start(ServerName)
+    server = nova_client.servers.create(ServerName, ImageID, Flavor)
+    nova_client.servers.start(server.id.enconde('ascii'))
 
 
 # main is used for testing
@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     # NOTE: try the swift auth token
     # can be found via command "swift stat -v"
-
     glance_client = Client('1', endpoint="http://10.131.69.112:9292", token="8520212cd1a34b39b0e9d8d475144abb")
 
     image = upload_new_image(glance_client, "gather.raw", True)
