@@ -11,7 +11,8 @@ from glanceclient import Client
 # first create a nova servergroup
 # load the image into the server
 #
-def activate_image(nova_Client, ImageID, ServerName="myserver", Flavor=2):
+def activate_image(nova_client, ImageID, ServerName="myserver", Flavor=4, userdata=None):
+    print "Booting server..."
     nova_client.servers.create(ServerName, ImageID, Flavor)
     nova_client.servers.start(ServerName)
 
