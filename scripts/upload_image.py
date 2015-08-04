@@ -20,6 +20,7 @@ if __name__ == "__main__":
     OS_TENANT_NAME = 'BXBInternBox'
     OS_USERNAME = 'josephor'
     OS_REGION_NAME = 'us-internal-1'
+    OS_PASSWORD = raw_input('Enter password:')
 
     keystone = ksclient.Client(auth_url=OS_AUTH_URL,
                                username=OS_USERNAME,

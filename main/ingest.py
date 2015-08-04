@@ -4,12 +4,12 @@ import json
 import os
 
 
-def find_num_frames(pict_type, filename):
+def find_num_frames(frame_type, filename):
     """Find and return the number of frames of a given type
-    Valid pict_type's are 'I', 'P', and 'B'.
+    Valid frame_types are 'I', 'P', and 'B'.
     """
     command = ('ffprobe -loglevel quiet -show_frames ' + filename + ' | ' +
-               'grep pict_type=' + pict_type + ' | wc -l')
+               'grep pict_type=' + frame_type + ' | wc -l')
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     return int(process.stdout.read())
 
