@@ -62,7 +62,16 @@ def write_file(filename, credentials, container='videos', type='video'):
                          content_type=type)
 
 
-def write_index(filename, index_file='index.json'):
+def write_index(filename, index, index_file='index.json'):
     try:
-        json.load(index_file)
+        with open(index_file, 'r') as idx:
+            total_index = json.load(idx)
+        total_index[filename] = index
+        with open(index_file, 'w+') as idx:
+            json.dump(total_index, idx, sort_keys=True)
+
     except ValueError:
+        total_index = dict()
+        total_index[filename] =
+        with open(index_file, 'w+') as idx:
+            json.dump(total_index, idx, sort_keys=True)
