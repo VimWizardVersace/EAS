@@ -4,17 +4,44 @@
 
 from subprocess import call, Popen, PIPE
 from novaclient import client
+from novaclient import exceptions
 from keystoneclient import session
 from keystoneclient.auth.identity import v2
 from glanceclient import Client
+from time import sleep
+from threading import Thread
+
 # after the image is uploaded, you will need to boot it with nova
-# first create a nova servergroup
-# load the image into the server
 #
-def activate_image(nova_client, ImageID, ServerName="myserver", Flavor=4, userdata=None):
-    print "Booting server..."
+def activate_image(nova_client, ImageID, ServerName, Flavor):
     server = nova_client.servers.create(ServerName, ImageID, Flavor)
-    nova_client.servers.start(server.id.enconde('ascii'))
+    return server
+
+
+# keep starting servers until we run out of room
+#
+def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
+    server_list = []
+    while True:
+        try:
+            server = activate_image(nova_client, ImageID, "Transburst Server Group", 3)
+            sleep(5)
+            server.diagnostics()
+        except exceptions.Forbidden:
+            print "Local cloud core quota reached"
+            break 
+        except exceptions.ClientException:
+            print "Local cloud resource quota reached"
+            server.delete()
+            break
+        server_list.append(server)
+        print "booted %s server #%i" %(len(server_list), loc)
+        if (len(server_list) == max_num_servers):
+            break
+    return server_list
+
+
+
 
 
 # main is used for testing
