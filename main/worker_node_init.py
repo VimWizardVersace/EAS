@@ -18,30 +18,57 @@ def activate_image(nova_client, ImageID, ServerName, Flavor):
     return server
 
 
-# keep starting servers until we run out of room
+# keep spamming servers until we run out of room
 #
 def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
     server_list = []
     while True:
         try:
             server = activate_image(nova_client, ImageID, "Transburst Server Group", 3)
-            sleep(5)
             server.diagnostics()
+            while (not is_done_booting(server)):
+                continue
         except exceptions.Forbidden:
-            print "Local cloud core quota reached"
-            break 
-        except exceptions.ClientException:
+            print "Your credentials don't give you access to building servers."
+            break
+        except exceptions.RateLimit:
+            print "Rate limit reached"
+            print "3..."
+            sleep(1)
+            print "2..."
+            sleep(1)
+            print"1..."
+            sleep(1)
+            continue
+        except (exceptions.ClientException, exceptions.OverLimit) as e:
+            print e
             print "Local cloud resource quota reached"
-            server.delete()
             break
         server_list.append(server)
-        print "booted %s server #%i" %(len(server_list), loc)
+        print "booted %s server #%i" %(loc, len(server_list))
         if (len(server_list) == max_num_servers):
             break
+
     return server_list
 
+# checks the exceptions error for any mention of a powerstate.  
+#
+def is_done_booting(server):
+    try:
+        server.diagnostics()
+    except exceptions.Conflict as e:
+        if 'power state' in e
+            return False
+        else:
+            return None
+    return True
 
 
+# clean up time
+#
+def kill_servers(server_list):
+    for server in server_list:
+        server.delete()
 
 
 # main is used for testing
