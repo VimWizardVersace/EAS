@@ -34,7 +34,8 @@ def ingest_directory(directory, credentials):
 
 def ingest_file(filename, credentials):
     index = generate_index(filename)
-    write_file(filename, credentials)
+    write_index(filename, index)
+    swift_move(filename, credentials)
 
 
 def generate_index(filename):
@@ -55,11 +56,11 @@ def generate_index(filename):
     return index
 
 
-def write_file(filename, credentials, container='videos', type='video'):
+def swift_move(filename, credentials, container='videos', content_type='video'):
     swift = create_swift_client(credentials)
     with open(filename, 'rb') as f:
         swift.put_object(container, filename, contents=f,
-                         content_type=type)
+                         content_type=content_type)
 
 
 def write_index(filename, index, index_filename='index.json'):
