@@ -33,11 +33,11 @@ def ingest_directory(directory, credentials):
 
 
 def ingest_file(filename, credentials):
-    index = index_file(filename)
+    index = generate_index(filename)
     write_file(filename, credentials)
 
 
-def index_file(filename):
+def generate_index(filename):
     info = Converter.probe(filename)
     index = dict()
 
@@ -60,3 +60,9 @@ def write_file(filename, credentials, container='videos', type='video'):
     with open(filename, 'rb') as f:
         swift.put_object(container, filename, contents=f,
                          content_type=type)
+
+
+def write_index(filename, index_file='index.json'):
+    try:
+        json.load(index_file)
+    except ValueError:
