@@ -1,3 +1,4 @@
+from client_create import create_swift_client
 from converter import Converter
 import subprocess
 import json
@@ -14,24 +15,29 @@ def find_num_frames(frame_type, filename):
     return int(process.stdout.read())
 
 
-def ingest(path):
+def ingest(path, credentials):
     if os.path.isdir(path):
-        ingest_directory(path)
+        ingest_directory(path, credentials)
 
     elif os.path.isfile(path):
-        ingest_file(path)
+        ingest_file(path, credentials)
 
     else:
         raise IOError('Location not valid file or folder')
 
 
-def ingest_directory(directory):
+def ingest_directory(directory, credentials):
     for filename in os.listdir(directory):
         if not filename.endswith('.py'):
-            ingest_file(filename)
+            ingest_file(filename, credentials)
 
 
-def ingest_file(filename):
+def ingest_file(filename, credentials):
+    index = index_file(filename)
+    write_file(filename, credentials)
+
+
+def index_file(filename):
     info = Converter.probe(filename)
     index = dict()
 
@@ -47,3 +53,10 @@ def ingest_file(filename):
     index['a codec'] = info.audio.codec
 
     return index
+
+
+def write_file(filename, credentials, container='videos', type='video'):
+    swift = create_swift_client(credentials)
+    with open(filename, 'rb') as f:
+        swift.put_object(container, filename, contents=f,
+                         content_type=type)
