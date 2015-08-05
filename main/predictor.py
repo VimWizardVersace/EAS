@@ -210,14 +210,13 @@ def predict(filename, predictor=None, scaler=None, config=None):
     return predictor.predict(scaled_vec)[0]
 
 
-# Just does some basic testing to show how to use functions
+# Running this file will train a predictor based off the training data found in
+# the specified csv file
 if __name__ == '__main__':
-    raw_data = parse_data('conversions_total.csv')
+    training_data = 'conversions_total.csv'
+
+    raw_data = parse_data(training_data)
     scaled_data, scaler = scale_data(raw_data)
     final_data = split_data(scaled_data, 2/3.)
-
     predictor = train_predictor(final_data)
-    error = test_predictor(final_data)
 
-    test_vec = raw_data[0][0]
-    prediction = predict(test_vec)
