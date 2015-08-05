@@ -29,7 +29,7 @@ def parse_data(file_name):
         X.append(data_vec)
         T.append(float(row[14]))
 
-    return (X, T)
+    return X, T
 
 
 def scale_data((X, T), save=True):

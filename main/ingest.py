@@ -28,7 +28,7 @@ def ingest(path, credentials):
 
 def ingest_directory(directory, credentials):
     for filename in os.listdir(directory):
-        if not filename.endswith('.py'):
+        if not filename.endswith('.py') and not filename.endswith('.txt'):
             ingest_file(filename, credentials)
 
 
