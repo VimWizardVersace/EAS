@@ -1,7 +1,9 @@
 from sklearn.externals import joblib
 from sklearn import preprocessing
 from sklearn import grid_search
+from ingest import read_index
 from sklearn import svm
+import json
 import csv
 import os
 
@@ -152,7 +154,46 @@ def load_scaler():
     return joblib.load(load_directory + '/scaler.pkl')
 
 
-def predict(vec, predictor=None, scaler=None):
+def load_config():
+    """ Load and return default configuration (found on config.conf) """
+
+    if not os.path.exists('config.json'):
+        raise IOError('No default configuration found')
+
+    return json.load(open('config.json'))
+
+
+def generate_vec(filename, transcode_config):
+    """ Generates the vector, using the input and output data on the video,
+    used by the machine learning algorithm to predict transcode time. The data
+    must be in the same order as when the machine learning algorithm was
+    trained, which is defined as follows:
+
+    [Video Duration, Input FPS, I frames, B frames, P frames, Output FPS,
+    Input width, Input height, Output width, Output height]
+    """
+    index = read_index()
+    input_info = index[filename]
+
+    o_size = transcode_config['video']['size']
+    o_width = int(o_size.split('x')[0])
+    o_height = int(o_size.split('x')[0])
+
+    vec = [input_info['duration'],
+           input_info['fps'],
+           input_info['i frames'],
+           input_info['b frames'],
+           input_info['p frames'],
+           transcode_config['video']['fps'],
+           input_info['width'],
+           input_info['height'],
+           o_width,
+           o_height]
+
+    return vec
+
+
+def predict(filename, predictor=None, scaler=None, config=None):
     """ Makes a prediction of based off unscaled data passed to the
     function, loading the predictor and scaler from files if none are
     passed to the function
@@ -161,7 +202,10 @@ def predict(vec, predictor=None, scaler=None):
         scaler = load_scaler()
     if not predictor:
         predictor = load_predictor()
+    if not config:
+        config = load_config()
 
+    vec = generate_vec(filename, config)
     scaled_vec = scaler.transform([vec])[0]
     return predictor.predict(scaled_vec)[0]
 

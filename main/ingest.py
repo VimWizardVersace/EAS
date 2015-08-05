@@ -63,6 +63,10 @@ def swift_move(filename, credentials, container='videos', content_type='video'):
                          content_type=content_type)
 
 
+def read_index(index_filename='index.json'):
+    return json.load(open(index_filename))
+
+
 def write_index(filename, index, index_filename='index.json'):
     try:
         with open(index_filename, 'r') as index_file:
