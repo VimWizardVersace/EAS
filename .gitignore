@@ -1,3 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
 main/__init__.py
 useless/__init__.py
+main/generate_config.py
