@@ -17,6 +17,14 @@ def activate_image(nova_client, ImageID, ServerName, Flavor):
     server = nova_client.servers.create(ServerName, ImageID, Flavor)
     return server
 
+# once you get a server object, that information is constant.  
+# in order to get the most up to date information on a nova server, you
+# must ask for it again.  this is used primarily for finding the status
+# of a machine (active, error, building...)
+#
+def update_status(nova_client, server):
+    server = nova_client.servers.get(server.id)
+    return server
 
 # keep spamming servers until we run out of room
 #
@@ -25,8 +33,11 @@ def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
     while True:
         try:
             server = activate_image(nova_client, ImageID, "Transburst Server Group", 3)
-            server.diagnostics()
             while (not is_done_booting(server)):
+                server = update_status(nova_client, server)
+                if (server.status == "ERROR"):
+                    server.delete()
+                    return server_list
                 continue
         except exceptions.Forbidden:
             print "Your credentials don't give you access to building servers."
@@ -41,7 +52,6 @@ def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
             sleep(1)
             continue
         except (exceptions.ClientException, exceptions.OverLimit) as e:
-            print e
             print "Local cloud resource quota reached"
             break
         server_list.append(server)
@@ -51,18 +61,13 @@ def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
 
     return server_list
 
-# checks the exceptions error for any mention of a powerstate.  
+# checks the server status to see if it's still building  
 #
 def is_done_booting(server):
-    try:
-        server.diagnostics()
-    except exceptions.Conflict as e:
-        if 'power state' in e
-            return False
-        else:
-            return None
-    return True
-
+    if (server.status == "BUILD"):
+        return False
+    else:
+        return True
 
 # clean up time
 #
