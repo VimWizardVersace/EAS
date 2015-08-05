@@ -217,6 +217,6 @@ if __name__ == '__main__':
 
     raw_data = parse_data(training_data)
     scaled_data, scaler = scale_data(raw_data)
-    final_data = split_data(scaled_data, 2/3.)
+    final_data = split_data(scaled_data, 1.)
     predictor = train_predictor(final_data)
 
