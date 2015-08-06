@@ -10,6 +10,7 @@ from keystoneclient.auth.identity import v2
 from glanceclient import Client
 from time import sleep
 from threading import Thread
+from request import post
 
 # after the image is uploaded, you will need to boot it with nova
 #
@@ -27,6 +28,9 @@ def update_status(nova_client, server):
     return server
 
 def post_workload(nova_client, server, workload):
+    ip_address = nova_client.servers.ips(server)
+    files_to_download = {'file': open(workload, 'rb')}
+    r = request.post(ip_address, files=files_to_download)
     pass
 
 # keep spamming servers until we run out of room
@@ -36,9 +40,11 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule):
     print "Spawning transburst servers..."
     while True:
         try:    
-            # make a unique workload for each individual VM from the schedule list.
+            # make a unique workload file for each individual VM from the schedule list.
             workload = schedule[len(server_list)]
-            workload = " ".join(workload)
+            f = open("workload.txt",'w')
+            for video in workload:
+                f.write(video+'\n')
 
             # files argument takes a dictionary where keys are destination path and value is the contents of the file
             # on the server, we can create a file called "workload.txt"
@@ -46,7 +52,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule):
             server = activate_image(nova_client, ImageID, "Transburst Server Group", 3)
 
             # using the rest api, send the workload to the vm.
-            post_workload(nova_client, server, workload)
+            post_workload(nova_client, server, "workload.txt")
             
             # keep checking to make sure the server has been booted.
             # if an error state is reached, fall back.
