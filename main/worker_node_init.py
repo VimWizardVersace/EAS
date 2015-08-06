@@ -26,22 +26,41 @@ def update_status(nova_client, server):
     server = nova_client.servers.get(server.id)
     return server
 
+def post_workload(nova_client, server, workload):
+    pass
+
 # keep spamming servers until we run out of room
 #
-def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
+def spawn(nova_client, ImageID, ServerName, loc, schedule):
     server_list = []
+    print "Spawning transburst servers..."
     while True:
-        try:
+        try:    
+            # make a unique workload for each individual VM from the schedule list.
+            workload = schedule[len(server_list)]
+            workload = " ".join(workload)
+
+            # files argument takes a dictionary where keys are destination path and value is the contents of the file
+            # on the server, we can create a file called "workload.txt"
+            # and put that vm's workload in that file.
             server = activate_image(nova_client, ImageID, "Transburst Server Group", 3)
+
+            # using the rest api, send the workload to the vm.
+            post_workload(nova_client, server, workload)
+            
+            # keep checking to make sure the server has been booted.
+            # if an error state is reached, fall back.
             while (not is_done_booting(server)):
                 server = update_status(nova_client, server)
                 if (server.status == "ERROR"):
                     server.delete()
                     return server_list
                 continue
+
         except exceptions.Forbidden:
             print "Your credentials don't give you access to building servers."
             break
+
         except exceptions.RateLimit:
             print "Rate limit reached"
             print "3..."
@@ -51,12 +70,17 @@ def spawn(nova_client, ImageID, ServerName, loc, max_num_servers):
             print"1..."
             sleep(1)
             continue
+
         except (exceptions.ClientException, exceptions.OverLimit) as e:
             print "Local cloud resource quota reached"
             break
+
+        # it's probably a good idea to keep these servers stored somewhere easily accessible    
         server_list.append(server)
         print "booted %s server #%i" %(loc, len(server_list))
-        if (len(server_list) == max_num_servers):
+  
+        # check to see if we booted enough vms
+        if (len(server_list) == len(schedule)):
             break
 
     return server_list
@@ -75,6 +99,22 @@ def kill_servers(server_list):
     for server in server_list:
         server.delete()
 
+
+# given the resources you have available and the resources a single vm consumes,
+# calculate how many vms you can fit on your cloud.
+#
+def find_local_max_number_of_vms(nova_client, tenant_name, flavor):
+    flavor = nova_client.flavors.get(flavor)
+    ram_per_vm = flavor.ram
+    cores_per_vm = flavor.vpus 
+
+    quota = nova_client.quotas.get(tenant_name)
+    max_ram = quota.ram
+    max_cores = quota.cores
+    max_servers = quota.server_groups
+
+    num_vms = min(max_ram/ram_per_vm, max_cores/cores_per_vm, max_servers)
+    return num_vms
 
 # main is used for testing
 #
