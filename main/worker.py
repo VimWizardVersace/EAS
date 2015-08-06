@@ -15,6 +15,8 @@ def config():
     Thread(target=process)
     return ''
 
+@app.rout('/read',methods=['post'])
+def read()
 
 def read_config(config_file='config.json'):
     with open(config_file) as json_config:
@@ -56,7 +58,6 @@ def convert(file_name, config):
 
     for c in c_gen:
         pass
-    return t
 
 
 def process():
@@ -64,6 +65,7 @@ def process():
     config = read_config()
     for filename in file_list:
         grab_file(filename)
+        convert(filename, config)
 
 
 
