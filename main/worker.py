@@ -15,8 +15,6 @@ def config():
     Thread(target=process)
     return ''
 
-@app.rout('/read',methods=['post'])
-def read()
 
 def read_config(config_file='config.json'):
     with open(config_file) as json_config:
