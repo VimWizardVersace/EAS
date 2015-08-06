@@ -1,0 +1,12 @@
+{
+    "audio": {
+        "codec": "libvo_aacenc"
+    }, 
+    "format": "m3u8", 
+    "video": {
+        "bitrate": 820000, 
+        "codec": "h264", 
+        "fps": 24, 
+        "size": "1280x720"
+    }
+}

@@ -28,7 +28,7 @@ def ingest(path, credentials):
 
 def ingest_directory(directory, credentials):
     for filename in os.listdir(directory):
-        if not filename.endswith('.py'):
+        if not filename.endswith('.py') and not filename.endswith('.txt'):
             ingest_file(filename, credentials)
 
 
@@ -61,6 +61,10 @@ def swift_move(filename, credentials, container='videos', content_type='video'):
     with open(filename, 'rb') as f:
         swift.put_object(container, filename, contents=f,
                          content_type=content_type)
+
+
+def read_index(index_filename='index.json'):
+    return json.load(open(index_filename))
 
 
 def write_index(filename, index, index_filename='index.json'):

@@ -11,8 +11,8 @@ def find_matching_files(search_type, search_directory):
 
     for f in to_check:
         attributes = f.split('.')
-        if len(attributes) >= 2 and \
-                attributes[-1] == search_type:
+        if (len(attributes) >= 2 and
+                attributes[-1] == search_type):
             to_convert.append(f)
 
     return to_convert

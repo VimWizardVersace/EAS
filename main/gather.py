@@ -3,7 +3,6 @@ from converter import Converter, ffmpeg
 import youtube_dl
 import subprocess
 import random
-import glob
 import time
 import csv
 import os
@@ -116,66 +115,67 @@ def convert(file_name, config):
     return t
 
 
-# Create the default name used throughout the program structure. Done
-# to avoid issues with modules not conforming to unicode, which many
-# youtubes use
-default_name = 'video'
-default_type = 'mp4'
-file_name = default_name + '.' + default_type
+if __name__ == '__main__':
+    # Create the default name used throughout the program structure. Done
+    # to avoid issues with modules not conforming to unicode, which many
+    # youtubes use
+    default_name = 'video'
+    default_type = 'mp4'
+    file_name = default_name + '.' + default_type
 
-# Read in the predefined data from the text files
-urls = get_data('url_list.txt')
-fpss = get_data('fps_list.txt')
-sizes = get_data('size_list.txt')
-codecs = get_data('codec_list.txt')
-bitrates = get_data('bitrate_list.txt')
+    # Read in the predefined data from the text files
+    urls = get_data('url_list.txt')
+    fpss = get_data('fps_list.txt')
+    sizes = get_data('size_list.txt')
+    codecs = get_data('codec_list.txt')
+    bitrates = get_data('bitrate_list.txt')
 
-options = [codecs, fpss, bitrates, sizes]
+    options = [codecs, fpss, bitrates, sizes]
 
-# Create CSV file for data and write data types to top of file
-conversion_data = open('conversions.csv', 'w+', 0)
-writer = csv.writer(conversion_data, delimiter=str(','),
-                    quoting=csv.QUOTE_MINIMAL)
-first_line = ['Input Container Format', 'Video Duration', 'Input FPS',
-              'Input Video Codec', 'Input Resolution', 'Input Audio Codec',
-              'Input # i-frames', 'Input # b-frames', 'Input # p-frames',
-              'Output Container Format', 'Output FPS', 'Output Video Codec',
-              'Output Resolution', 'Output Audio Codec', 'Transcode Time']
-writer.writerow(first_line)
+    # Create CSV file for data and write data types to top of file
+    conversion_data = open('conversions.csv', 'w+', 0)
+    writer = csv.writer(conversion_data, delimiter=str(','),
+                        quoting=csv.QUOTE_MINIMAL)
+    first_line = ['Input Container Format', 'Video Duration', 'Input FPS',
+                  'Input Video Codec', 'Input Resolution', 'Input Audio Codec',
+                  'Input # i-frames', 'Input # b-frames', 'Input # p-frames',
+                  'Output Container Format', 'Output FPS', 'Output Video Codec',
+                  'Output Resolution', 'Output Audio Codec', 'Transcode Time']
+    writer.writerow(first_line)
 
-# Infinitely loop to continuously generate data until stopped manually
-c = Converter()
-while True:
-    config = random_config(options)
-    get_random_video(urls)
-    elapsed_time = convert(file_name, config)
+    # Infinitely loop to continuously generate data until stopped manually
+    c = Converter()
+    while True:
+        config = random_config(options)
+        get_random_video(urls)
+        elapsed_time = convert(file_name, config)
 
-    files = os.listdir('.')
-    for f in files:
-        # Different information is needed for the mp4 and m3u8 files
-        # so they are handled separately
-        if f.endswith('.mp4'):
-            i_frames = find_num_frames('I')
-            b_frames = find_num_frames('B')
-            p_frames = find_num_frames('P')
-            info = c.probe(f)
-            size = (str(info.video.video_width) + 'x' +
-                    str(info.video.video_height))
-            original = [info.format.format, info.format.duration,
-                        info.video.video_fps, info.video.codec, size,
-                        info.audio.codec, i_frames, b_frames, p_frames]
+        files = os.listdir('.')
+        for f in files:
+            # Different information is needed for the mp4 and m3u8 files
+            # so they are handled separately
+            if f.endswith('.mp4'):
+                i_frames = find_num_frames('I')
+                b_frames = find_num_frames('B')
+                p_frames = find_num_frames('P')
+                info = c.probe(f)
+                size = (str(info.video.video_width) + 'x' +
+                        str(info.video.video_height))
+                original = [info.format.format, info.format.duration,
+                            info.video.video_fps, info.video.codec, size,
+                            info.audio.codec, i_frames, b_frames, p_frames]
 
-        if f.endswith('.m3u8'):
-            info = c.probe(f)
-            size = (str(info.video.video_width) + 'x' +
-                    str(info.video.video_height))
-            output = [info.format.format, info.video.video_fps,
-                      info.video.codec, size, info.audio.codec]
+            if f.endswith('.m3u8'):
+                info = c.probe(f)
+                size = (str(info.video.video_width) + 'x' +
+                        str(info.video.video_height))
+                output = [info.format.format, info.video.video_fps,
+                          info.video.codec, size, info.audio.codec]
 
-    # Cleanup video files to save disk space
-    for f in files:
-        if f.endswith('.mp4') or f.endswith('.ts') or f.endswith('.m3u8'):
-            os.remove(f)
+        # Cleanup video files to save disk space
+        for f in files:
+            if f.endswith('.mp4') or f.endswith('.ts') or f.endswith('.m3u8'):
+                os.remove(f)
 
-    writer.writerow(original + output + [elapsed_time])
+        writer.writerow(original + output + [elapsed_time])
 #######################################################################
