@@ -16,7 +16,7 @@ list_of_test_files = ['/Users/rumadera/projects/EAS/scripts/vids/1.mp4',
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
-                           "OS_PASSWORD": ,
+                           "OS_PASSWORD": '',
                            "OS_TENANT_NAME": 'BXBInternBox' ,
                            "OS_REGION_NAME": 'us-internal-1'}
 

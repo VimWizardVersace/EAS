@@ -17,7 +17,7 @@ from time import sleep
 #
 
 
-#this function is useless and was used mostly for testing
+#this function is misc and was used mostly for testing
 def get_cloud_hourly_rates(URL, bot_hdr):
 	req = urllib2.Request(URL, headers=bot_hdr)
 
