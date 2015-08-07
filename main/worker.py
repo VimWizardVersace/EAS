@@ -1,6 +1,8 @@
 from flask import Flask, request
 from threading import Thread
 from converter import ffmpeg
+from transburst_utils import parse_config_file
+from client_create import create_swift_client
 import json
 import os
 
@@ -22,8 +24,20 @@ def read_config(config_file='config.json'):
 
 
 def grab_file(filename):
-    """ Download file from swift """
-    pass
+    # in order to interact with swift storage, we need credentials
+    # and we need to create an actual client with the swiftclient API
+    # this assumes several things:
+    # 1) the remote credentials have been posted to the worker VM
+    # 2) client_create.py and transburst_utils.py are in the current directory
+    credentials = parse_config_file("transburst.conf")
+    sw_client = create_swift_client(credentials)
+    
+    # reminder: sw_client.get_object returns a tuple in the form of (filename, file content)
+    vid_tuple = sw_client.get_object("Videos", filename)
+
+    # finally, write a file to the local directory with the same name as the file we are retrieving
+    with open(filename, 'wb') as new_vid:
+        new_vid.write(vid_tuple[1])
 
 
 def convert(file_name, config):
