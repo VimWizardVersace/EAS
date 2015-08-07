@@ -27,11 +27,16 @@ def update_status(nova_client, server):
     server = nova_client.servers.get(server.id)
     return server
 
+# REST api magic
 def post_workload(nova_client, server, workload):
+    # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)
+
+    # post request takes a dictionary as argument, {filename: file pointer}
     files_to_download = {'file': open(workload, 'rb')}
+
+    # make the request using the two variables created above
     r = request.post(ip_address, files=files_to_download)
-    pass
 
 # keep spamming servers until we run out of room
 #
@@ -40,8 +45,10 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule):
     print "Spawning transburst servers..."
     while True:
         try:    
-            # make a unique workload file for each individual VM from the schedule list.
-            workload = schedule[len(server_list)]
+            # reminder: schedule stores a list of list of videos.  each internal list is a seperate workload 
+            # for each vm.  
+            # each time we go through this loop for each VM, the workload will be different.
+            workload = schedule.pop()
             f = open("workload.txt",'w')
             for video in workload:
                 f.write(video+'\n')
