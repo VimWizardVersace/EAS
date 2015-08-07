@@ -12,10 +12,43 @@ app.config['UPLOAD_FOLDER'] = '~/tmp'
 
 @app.route("/jobs", methods=['POST'])
 def jobs():
+    swift_files = '~/swift_list'
     f = request.files['file']
-    f.save(os.path.join(app.config['UPLOAD_FOLDER'], 'file_list'))
-    Thread(target=process)
+    f.save(os.path.join(app.config['UPLOAD_FOLDER'], swift_files))
+    Thread(target=controller)
     return ''
+
+
+def controller(swift_files='~/swift_list'):
+    swift_list = read_list(swift_files)
+
+    # Grab the first file and wait until it finishes before doing anything else
+    grab_file(swift_list[0])
+
+    Thread(target=grab_thread)
+    Thread(target=spawn_thread)
+    Thread(target=place_thread)
+
+
+def grab_thread():
+    pass
+
+
+def spawn_thread():
+    pass
+
+
+def place_thread():
+    pass
+
+
+def read_list(swift_urls):
+    urls = []
+    with open(swift_urls, 'r+') as swift_url_list:
+        for line in swift_url_list.readlines():
+            urls.append(line)
+
+    return urls
 
 
 def read_config(config_file='config.json'):
