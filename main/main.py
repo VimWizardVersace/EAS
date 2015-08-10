@@ -82,14 +82,14 @@ if __name__ == "__main__":
         upload_image.upload(remote_glclient, remote_ksclient, images)
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1].id.encode('ascii'), "Remote Transburst Server Group", 'remote', len(remote_workload))
 
+        while (not scheduling.transcode_job_complete()):
+            continue
 
         """Retrieve data from remote cloud"""
-        move_data.Get_data_from_remote_cloud(swclient, remote_swclient, container="Videos")
+        move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
-    while (not worker_node_init.transcode_job_complete()):
+    while (not scheduling.transcode_job_complete()):
         continue
-
-    move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
     worker_node_init.kill_servers(local_servers)
     worker_node_init.kill_servers(remote_servers)
