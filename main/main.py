@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
-    schedule = scheduling.partition_workload(time_remaining, test_conversion_rate, swclient, "Videos")
+    schedule = scheduling.partition_workload(time_remaining, swclient, "Videos")
 
     """Start up image on our local cloud"""
     images = []
@@ -87,13 +87,13 @@ if __name__ == "__main__":
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1].id.encode('ascii'), "Remote Transburst Server Group", 'remote', len(remote_workload))
 
         while (not scheduling.transcode_job_complete()):
-            continue
+            sleep(5)
 
         """Retrieve data from remote cloud"""
         move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
-    while (not scheduling.transcode_job_complete()):
-        continue
+    while not scheduling.transcode_job_complete():
+        sleep(1)
 
     worker_node_init.kill_servers(local_servers)
     worker_node_init.kill_servers(remote_servers)
