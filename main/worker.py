@@ -3,11 +3,16 @@ from client_create import create_swift_client
 from flask import Flask, request
 from threading import Thread
 from converter import ffmpeg
+from Queue import Queue
 import json
 import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '~/tmp'
+
+grabQ = Queue()
+convertQ = Queue()
+placeQ = Queue()
 
 
 @app.route("/jobs", methods=['POST'])
@@ -20,35 +25,50 @@ def jobs():
 
 
 def controller(swift_files='~/swift_list'):
-    swift_list = read_list(swift_files)
-
-    # Grab the first file and wait until it finishes before doing anything else
-    grab_file(swift_list[0])
+    fill_grabQ(swift_files)
 
     Thread(target=grab_thread)
-    Thread(target=spawn_thread)
+    Thread(target=convert_thread)
     Thread(target=place_thread)
 
 
 def grab_thread():
-    pass
+    global grabQ, convertQ
+
+    credentials = parse_config_file("transburst.conf")
+    sw_client = create_swift_client(credentials)
+
+    while True:
+        filename = grabQ.get()
+        grab(sw_client, filename)
+        convertQ.put(filename)
 
 
-def spawn_thread():
-    pass
+def convert_thread():
+    global convertQ, placeQ
+
+    while True:
+        filename = convertQ.get()
+        new_name = convert(filename)
+        placeQ.put(new_name)
 
 
 def place_thread():
-    pass
+    global placeQ
+
+    credentials = parse_config_file("transburst.conf")
+    sw_client = create_swift_client(credentials)
+
+    while True:
+        filename = placeQ.get()
+        place(sw_client, filename)
 
 
-def read_list(swift_urls):
-    urls = []
+def fill_grabQ(swift_urls):
+    global grabQ
     with open(swift_urls, 'r+') as swift_url_list:
         for line in swift_url_list.readlines():
-            urls.append(line)
-
-    return urls
+            grabQ.put(line.strip())
 
 
 def read_config(config_file='config.json'):
@@ -56,7 +76,7 @@ def read_config(config_file='config.json'):
         return json.load(json_config)
 
 
-def grab_file(filename):
+def grab(sw_client, filename):
     """
     In order to interact with swift storage, we need credentials
     # and we need to create an actual client with the swiftclient API
@@ -64,9 +84,7 @@ def grab_file(filename):
     # 1) the remote credentials have been posted to the worker VM
     # 2) client_create.py and transburst_utils.py are in the current directory
     """
-    credentials = parse_config_file("transburst.conf")
-    sw_client = create_swift_client(credentials)
-    
+
     # reminder: sw_client.get_object returns a tuple in the form of:
     # (filename, file content)
     vid_tuple = sw_client.get_object("Videos", filename)
@@ -77,10 +95,19 @@ def grab_file(filename):
         new_vid.write(vid_tuple[1])
 
 
-def convert(file_name, config):
+def place(sw_client, filename, container='videos', content_type='video'):
+    with open(filename, 'rb') as f:
+        sw_client.put_object(container, filename, contents=f,
+                             content_type=content_type)
+
+
+def convert(file_name, config=None):
     """ Using python-vide-converter as an ffmpeg wrapper, convert a
         given file to match the given config.
     """
+
+    if not config:
+        config = read_config()
 
     # Create the new name based off the new format (found in the config
     # dictionary)
@@ -108,12 +135,14 @@ def convert(file_name, config):
     for c in c_gen:
         pass
 
+    return new_name
+
 
 def process():
     file_list = open('file_list', 'r+')
     config = read_config()
     for filename in file_list:
-        grab_file(filename)
+        grab(filename)
         convert(filename, config)
 
 
