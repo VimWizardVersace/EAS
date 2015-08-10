@@ -6,7 +6,7 @@ import client_create
 import upload_image
 import worker_node_init
 import scheduling
-import movedata
+import move_data
 
 test_deadline = "07/24/2015 12:40:00"
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     #####################################################
 
     """For testing purposes, move a couple of test videos to our local cloud before doing anything"""
-    movedata.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
+    move_data.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
 
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
@@ -55,13 +55,14 @@ if __name__ == "__main__":
     """Determine if a remote cloud is needed"""
     if (len(local_servers) == len(schedule)):
         local_only = True
+
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
     else:
         remote_workload = schedule[len(local_servers):]
 
-    """Given a deadline, workload, and a collection of data, determine which cloud to outsource to"""
     remote_servers = []
     if (not local_only):
+         """Given a deadline, workload, and a collection of data, determine which cloud to outsource to"""
         # remote_credentials = find_optimal_cloud(deadline, work_load_outsourced)
         remote_credentials = test_remote_credentials
 
@@ -83,10 +84,12 @@ if __name__ == "__main__":
 
 
         """Retrieve data from remote cloud"""
-        movedata.Get_data_from_remote_cloud(swclient, remote_swclient, container="Videos")
+        move_data.Get_data_from_remote_cloud(swclient, remote_swclient, container="Videos")
 
-    while (not transcode_job_complete()):
+    while (not worker_node_init.transcode_job_complete()):
         continue
+
+    move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
     worker_node_init.kill_servers(local_servers)
     worker_node_init.kill_servers(remote_servers)
