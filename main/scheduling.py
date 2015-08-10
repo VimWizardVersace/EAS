@@ -14,7 +14,7 @@ def find_epoch_time_until_deadline(deadline):
     except (ValueError):
         print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
 
-def partition_workload(time_until_deadline, bitrate, swiftclient, container_name):
+def partition_workload(time_until_deadline, swiftclient, container_name):
     # use curl to connect to the object storage
     # to discover the sizes of the videos to xcode
 
@@ -49,7 +49,7 @@ def partition_workload(time_until_deadline, bitrate, swiftclient, container_name
     tmp_t_u_d = time_until_deadline
     single_vm_capacity = []
     for video in file_list:
-        prediction_time = predictor.predict(storage_url+"/"+container_name+"/"+video)
+        prediction_time = predictor.predict(video)
 
         if (prediction_time > time_until_deadline):
             raise Exception("One of the files is too big to be transcoded by a VM in time.  Maybe cut it up into chunks and reupload it.")
