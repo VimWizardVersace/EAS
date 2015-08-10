@@ -15,27 +15,26 @@ convertQ = Queue()
 placeQ = Queue()
 
 
-@app.route("/jobs", methods=['POST'])
+@app.route('/jobs', methods=['GET', 'POST'])
 def jobs():
-    swift_files = '~/swift_list'
-    f = request.files['file']
-    f.save(os.path.join(app.config['UPLOAD_FOLDER'], swift_files))
-    Thread(target=controller)
-    return ''
+    if request.method == 'POST':
+        swift_files = '~/swift_list'
+        f = request.files['file']
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], swift_files))
 
-
-def controller(swift_files='~/swift_list'):
-    fill_grabQ(swift_files)
-
-    Thread(target=grab_thread)
-    Thread(target=convert_thread)
-    Thread(target=place_thread)
+        fill_grabQ(swift_files)
+        Thread(target=grab_thread)
+        Thread(target=convert_thread)
+        Thread(target=place_thread)
+        return ''
+    else:
+        return print_all_queues()
 
 
 def grab_thread():
     global grabQ, convertQ
 
-    credentials = parse_config_file("transburst.conf")
+    credentials = parse_config_file('transburst.conf')
     sw_client = create_swift_client(credentials)
 
     while True:
@@ -56,7 +55,7 @@ def convert_thread():
 def place_thread():
     global placeQ
 
-    credentials = parse_config_file("transburst.conf")
+    credentials = parse_config_file('transburst.conf')
     sw_client = create_swift_client(credentials)
 
     while True:
@@ -102,8 +101,9 @@ def place(sw_client, filename, container='videos', content_type='video'):
 
 
 def convert(file_name, config=None):
-    """ Using python-vide-converter as an ffmpeg wrapper, convert a
-        given file to match the given config.
+    """
+    Using python-vide-converter as an ffmpeg wrapper, convert a
+    given file to match the given config.
     """
 
     if not config:
@@ -138,12 +138,13 @@ def convert(file_name, config=None):
     return new_name
 
 
-def process():
-    file_list = open('file_list', 'r+')
-    config = read_config()
-    for filename in file_list:
-        grab(filename)
-        convert(filename, config)
+def print_all_queues():
+    global grabQ, convertQ, placeQ
+    grab_list = list(grabQ.queue)
+    convert_list = list(convertQ.queue)
+    place_list = list(placeQ.queue)
+
+    return str(grab_list) + str(convert_list) + str(place_list)
 
 
 if __name__ == '__main__':
