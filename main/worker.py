@@ -104,6 +104,7 @@ def place(sw_client, filename, container='completed', content_type='video'):
     with open(filename, 'rb') as f:
         sw_client.put_object(container, filename, contents=f,
                              content_type=content_type)
+    os.remove(filename)
 
 
 def convert(filename, config=None):
@@ -118,8 +119,9 @@ def convert(filename, config=None):
     # Create the new name based off the new format (found in the config
     # dictionary)
     name_parts = filename.split('.')
+    base = name_parts[0]
     form_type = config['format']
-    new_name = name_parts[0] + '.' + form_type
+    new_name = base + '.' + form_type
 
     # Although a dictionary is easiest to work with for entering
     # options from a human-readable point of view, the low-level ffmpeg
@@ -141,8 +143,18 @@ def convert(filename, config=None):
     for c in c_gen:
         pass
 
-    return new_name
+    os.remove(filename)
 
+    return tar(base)
+
+
+def tar(base):
+    archive = tarfile.open(base + '.tar', 'w')
+    for filename in os.listdir('.'):
+        if base in filename:
+            archive.add(filename)
+            os.remove(filename)
+    return base + '.tar'
 
 def print_all_queues():
     global grabQ, convertQ, placeQ
