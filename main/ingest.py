@@ -15,20 +15,9 @@ def find_num_frames(frame_type, filename):
     return int(process.stdout.read())
 
 
-def ingest(path, credentials):
-    if os.path.isdir(path):
-        ingest_directory(path, credentials)
-
-    elif os.path.isfile(path):
-        ingest_file(path, credentials)
-
-    else:
-        raise IOError('Location not valid file or folder')
-
-
-def ingest_directory(directory, credentials):
+def ingest(credentials, directory='.'):
     for filename in os.listdir(directory):
-        if not filename.endswith('.py') and not filename.endswith('.txt'):
+        if not filename.endswith('.py'):
             ingest_file(filename, credentials)
 
 

@@ -1,14 +1,14 @@
 # main.py
-from threading import Thread
 
+from ingest import ingest
+from time import sleep
+import worker_node_init
 import transburst_utils
 import client_create
 import upload_image
-import worker_node_init
 import scheduling
 import move_data
-import ingest
-import
+
 
 test_deadline = "07/24/2015 12:40:00"
 
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     credentials = transburst_utils.parse_config_file(file_pointer)
     print "Logging in to "+credentials["OS_AUTH_URL"]+" as "+credentials["OS_USERNAME"]+"..."
 
-    ingest.ingest('.',credentials)
+    ingest(credentials)
 
     ksclient = client_create.create_keystone_client(credentials)
     glclient = client_create.create_glance_client(ksclient)
@@ -66,7 +66,8 @@ if __name__ == "__main__":
 
     remote_servers = []
     if (not local_only):
-         """Given a deadline, workload, and a collection of data, determine which cloud to outsource to"""
+        """Given a deadline, workload, and a collection of data, determine
+         which cloud to outsource to"""
         # remote_credentials = find_optimal_cloud(deadline, work_load_outsourced)
         remote_credentials = test_remote_credentials
 
