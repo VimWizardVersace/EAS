@@ -10,7 +10,7 @@ from keystoneclient.auth.identity import v2
 from glanceclient import Client
 from time import sleep
 from threading import Thread
-from request import post
+from requests import post
 
 # after the image is uploaded, you will need to boot it with nova
 #
@@ -32,11 +32,12 @@ def post_workload(nova_client, server, workload):
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)
 
+    url = ip_address + ':5000/jobs'
     # post request takes a dictionary as argument, {filename: file pointer}
-    files_to_download = {'file': open(workload, 'rb')}
+    files_to_upload = {'file': open(workload, 'rb')}
 
     # make the request using the two variables created above
-    r = request.post(ip_address, files=files_to_download)
+    post(url, files=files_to_upload)
 
 # keep spamming servers until we run out of room
 #

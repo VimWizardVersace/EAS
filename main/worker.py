@@ -4,6 +4,7 @@ from flask import Flask, request
 from threading import Thread
 from converter import ffmpeg
 from Queue import Queue
+import tarfile
 import json
 import os
 
@@ -29,6 +30,11 @@ def jobs():
         return ''
     else:
         return print_all_queues()
+
+
+@app.route('/jobs/status')
+def completed():
+    return str(grabQ.empty() and convertQ.empty() and placeQ.empty())
 
 
 def grab_thread():
@@ -94,13 +100,13 @@ def grab(sw_client, filename):
         new_vid.write(vid_tuple[1])
 
 
-def place(sw_client, filename, container='videos', content_type='video'):
+def place(sw_client, filename, container='completed', content_type='video'):
     with open(filename, 'rb') as f:
         sw_client.put_object(container, filename, contents=f,
                              content_type=content_type)
 
 
-def convert(file_name, config=None):
+def convert(filename, config=None):
     """
     Using python-vide-converter as an ffmpeg wrapper, convert a
     given file to match the given config.
@@ -111,7 +117,7 @@ def convert(file_name, config=None):
 
     # Create the new name based off the new format (found in the config
     # dictionary)
-    name_parts = file_name.split('.')
+    name_parts = filename.split('.')
     form_type = config['format']
     new_name = name_parts[0] + '.' + form_type
 
@@ -130,7 +136,7 @@ def convert(file_name, config=None):
         new_config += ['-s', config['video']['size']]
 
     # Creates the generator used to convert the file
-    c_gen = ffmpeg.FFMpeg().convert(file_name, new_name, new_config)
+    c_gen = ffmpeg.FFMpeg().convert(filename, new_name, new_config)
 
     for c in c_gen:
         pass
