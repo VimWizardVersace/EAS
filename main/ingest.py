@@ -10,6 +10,7 @@ def find_num_frames(frame_type, filename):
     Valid frame_types are 'I', 'P', and 'B'.
     """
     print 'Finding number of', frame_type, 'frames for', filename
+    return 10
     command = ('ffprobe -loglevel quiet -show_frames ' + filename + ' | ' +
                'grep pict_type=' + frame_type + ' | wc -l')
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
@@ -21,13 +22,14 @@ def ingest(credentials, directory='.'):
     for filename in os.listdir(directory):
         if filename.endswith('.mp4') or filename.endswith('.mkv'):
             ingest_file(filename, credentials)
+    print 'Finished ingesting'
 
 
 def ingest_file(filename, credentials):
     print 'Ingesting file', filename
     index = generate_index(filename)
     write_index(filename, index)
-    # swift_move(filename, credentials)
+    swift_move(filename, credentials)
 
 
 def generate_index(filename):
@@ -36,9 +38,9 @@ def generate_index(filename):
     info = c.probe(filename)
     index = dict()
 
-    # index['i frames'] = find_num_frames('I', filename)
-    # index['b frames'] = find_num_frames('B', filename)
-    # index['p frames'] = find_num_frames('P', filename)
+    index['i frames'] = find_num_frames('I', filename)
+    index['b frames'] = find_num_frames('B', filename)
+    index['p frames'] = find_num_frames('P', filename)
     index['duration'] = info.format.duration
     index['width'] = info.video.video_width
     index['height'] = info.video.video_height
