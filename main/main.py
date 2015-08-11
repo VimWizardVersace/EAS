@@ -12,9 +12,8 @@ import move_data
 
 test_deadline = "07/24/2015 12:40:00"
 
-list_of_test_files = ['/Users/rumadera/projects/EAS/scripts/vids/1.mp4',
-                      '/Users/rumadera/projects/EAS/scripts/vids/3.mp4',
-                      '/Users/rumadera/projects/EAS/scripts/vids/5.mp4.mkv']
+list_of_test_files = ['v1.mkv',
+                      'v2.mkv',]
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
