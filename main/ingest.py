@@ -53,6 +53,7 @@ def generate_index(filename):
 def swift_move(filename, credentials, container='videos', content_type='video'):
     print 'Moving', filename, 'to swift'
     swift = create_swift_client(credentials)
+    swift.put_container(container)
     with open(filename, 'rb') as f:
         swift.put_object(container, filename, contents=f,
                          content_type=content_type)
