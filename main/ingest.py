@@ -18,7 +18,7 @@ def find_num_frames(frame_type, filename):
 def ingest(credentials, directory='.'):
     print 'Beginning ingest'
     for filename in os.listdir(directory):
-        if not filename.endswith('.py'):
+        if filename.endswith('.mp4') or filename.endswith('.mkv'):
             ingest_file(filename, credentials)
 
 
