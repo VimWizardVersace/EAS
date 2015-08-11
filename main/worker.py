@@ -144,7 +144,6 @@ def convert(filename, config=None):
         pass
 
     os.remove(filename)
-
     return tar(base)
 
 
@@ -155,6 +154,7 @@ def tar(base):
             archive.add(filename)
             os.remove(filename)
     return base + '.tar'
+
 
 def print_all_queues():
     global grabQ, convertQ, placeQ

@@ -9,25 +9,28 @@ def find_num_frames(frame_type, filename):
     """Find and return the number of frames of a given type
     Valid frame_types are 'I', 'P', and 'B'.
     """
+    print 'Finding number of', frame_type, 'frames for', filename
     command = ('ffprobe -loglevel quiet -show_frames ' + filename + ' | ' +
                'grep pict_type=' + frame_type + ' | wc -l')
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     return int(process.stdout.read())
 
-
 def ingest(credentials, directory='.'):
+    print 'Beginning ingest'
     for filename in os.listdir(directory):
         if not filename.endswith('.py'):
             ingest_file(filename, credentials)
 
 
 def ingest_file(filename, credentials):
+    print 'Ingesting file', filename
     index = generate_index(filename)
     write_index(filename, index)
     swift_move(filename, credentials)
 
 
 def generate_index(filename):
+    print 'Generating index for file', filename
     info = Converter.probe(filename)
     index = dict()
 
@@ -46,6 +49,7 @@ def generate_index(filename):
 
 
 def swift_move(filename, credentials, container='videos', content_type='video'):
+    print 'Moving', filename, 'to swift'
     swift = create_swift_client(credentials)
     with open(filename, 'rb') as f:
         swift.put_object(container, filename, contents=f,
@@ -53,10 +57,12 @@ def swift_move(filename, credentials, container='videos', content_type='video'):
 
 
 def read_index(index_filename='index.json'):
+    print 'Reading index'
     return json.load(open(index_filename))
 
 
 def write_index(filename, index, index_filename='index.json'):
+    print 'Writing index for', filename
     try:
         with open(index_filename, 'r') as index_file:
             total_index = json.load(index_file)
