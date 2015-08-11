@@ -10,7 +10,7 @@ import scheduling
 import move_data
 
 
-test_deadline = "07/24/2015 12:40:00"
+test_deadline = "07/24/2015 16:00:00"
 
 list_of_test_files = ['v1.mkv',
                       'v2.mkv',]
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     #####################################################
 
     """For testing purposes, move a couple of test videos to our local cloud before doing anything"""
-    move_data.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
+   #move_data.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
 
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
