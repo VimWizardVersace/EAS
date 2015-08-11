@@ -28,6 +28,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
     except IndexError:
         print "error (IndexError): container empty?"
     
+    print file_list
     # where we store the partitioned list of videos.
     # Internal lists seperate what is possible to transcode in time on one VM
     partitioned_video_list = []
@@ -44,6 +45,8 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
         if (tmp_t_u_d - prediction_time > 0):
             single_vm_capacity.append(video)
             tmp_t_u_d -= prediction_time
+            if (video == file_list[-1]):
+                artitioned_video_list.append(single_vm_capacity)
         
         else:
             tmp_t_u_d = time_until_deadline
@@ -56,8 +59,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
 def transcode_job_complete(server_list):
     for server in server_list:
         website = urllib2.urlopen(server.ips+":5000/jobs/status")
-        soup = BeautifulSoup(website.read())
-        if "False" in soup:
+        if "False" in website.read():
             return False
     return True
 
