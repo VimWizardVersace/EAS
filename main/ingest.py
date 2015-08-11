@@ -27,7 +27,7 @@ def ingest_file(filename, credentials):
     print 'Ingesting file', filename
     index = generate_index(filename)
     write_index(filename, index)
-    swift_move(filename, credentials)
+    # swift_move(filename, credentials)
 
 
 def generate_index(filename):
@@ -36,9 +36,9 @@ def generate_index(filename):
     info = c.probe(filename)
     index = dict()
 
-    index['i frames'] = find_num_frames('I', filename)
-    index['b frames'] = find_num_frames('B', filename)
-    index['p frames'] = find_num_frames('P', filename)
+    # index['i frames'] = find_num_frames('I', filename)
+    # index['b frames'] = find_num_frames('B', filename)
+    # index['p frames'] = find_num_frames('P', filename)
     index['duration'] = info.format.duration
     index['width'] = info.video.video_width
     index['height'] = info.video.video_height
