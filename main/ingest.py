@@ -15,6 +15,7 @@ def find_num_frames(frame_type, filename):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     return int(process.stdout.read())
 
+
 def ingest(credentials, directory='.'):
     print 'Beginning ingest'
     for filename in os.listdir(directory):
@@ -69,10 +70,15 @@ def write_index(filename, index, index_filename='index.json'):
             total_index = json.load(index_file)
         total_index[filename] = index
         with open(index_filename, 'w+') as index_file:
-            json.dump(total_index, index_file, sort_keys=True)
+            json.dump(total_index, index_file, sort_keys=True, indent=4)
 
-    except ValueError:
+    except IOError:
         total_index = dict()
         total_index[filename] = index
         with open(index_filename, 'w+') as index_file:
-            json.dump(total_index, index_file, sort_keys=True)
+            json.dump(total_index, index_file, sort_keys=True, indent=4)
+
+
+if __name__ == '__main__':
+    credentials = dict()
+    ingest(credentials)
