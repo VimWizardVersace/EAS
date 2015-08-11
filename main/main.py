@@ -8,6 +8,7 @@ import client_create
 import upload_image
 import scheduling
 import move_data
+import json
 
 
 test_deadline = "08/12/2015 16:00:00"
@@ -23,7 +24,7 @@ test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com
 
 if __name__ == "__main__":
     file_pointer = open("transburst.conf", 'r')
-    credentials = transburst_utils.parse_config_file(file_pointer)
+    credentials = json.load(open('transburst.json'))
     print "Logging in to "+credentials["OS_AUTH_URL"]+" as "+credentials["OS_USERNAME"]+"..."
 
     ingest(credentials)
