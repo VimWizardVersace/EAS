@@ -3,15 +3,22 @@ import glanceclient.v2.client as glclient
 
 
 # Note: be sure an accessuble glance public endpoint is available or this would time out
-def upload(glance_client, keystone_client, img_list):
-    image = glance_client.images.create(name="raw_convert", disk_format='raw',
+def upload(glance_client, keystone_client, images):
+    image = glance_client.images.create(name="worker", disk_format='raw',
                              container_format='bare')
 
     print 'Beginning upload of image'
-    glance_client.images.upload(image.id, open('/Users/rumadera/projects/EAS/scripts/gather.raw', 'rb'))
+    images.append(image)
+    glance_client.images.upload(image.id, open('/Users/rumadera/Documents/worker.raw', 'rb'))
     print 'Finished uploading of image'
-    img_list.append(image)
+    
     return image
+
+def find_image(glance_client):
+    image_list = list(glance_client.images.list())
+    for image in image_list:
+        if image.name == "worker" or image.name == "raw_convert" or image.name == "master_node":
+            return image.id
 
 if __name__ == "__main__":
     OS_AUTH_URL = 'https://us-internal-1.cloud.cisco.com:5000/v2.0'

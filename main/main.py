@@ -12,13 +12,12 @@ import move_data
 
 test_deadline = "07/24/2015 12:40:00"
 
-list_of_test_files = ['/Users/rumadera/projects/EAS/scripts/vids/1.mp4',
-                      '/Users/rumadera/projects/EAS/scripts/vids/3.mp4',
-                      '/Users/rumadera/projects/EAS/scripts/vids/5.mp4.mkv']
+list_of_test_files = ['v1.mkv',
+                      'v2.mkv',]
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
-                           "OS_PASSWORD": '',
+                           "OS_PASSWORD": '1ightriseR!',
                            "OS_TENANT_NAME": 'BXBInternBox' ,
                            "OS_REGION_NAME": 'us-internal-1'}
 
@@ -52,9 +51,10 @@ if __name__ == "__main__":
 
     """Start up image on our local cloud"""
     images = []
+    images.append(upload_image.find_image(glclient))
     remote_workload = []
-    upload_image.upload(glclient, ksclient, images)
-    local_servers = worker_node_init.spawn(nvclient, images[0].id.encode('ascii'), "Local Transburt Server Group", "local", schedule)
+    #upload_image.upload(glclient, ksclient, images)
+    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", schedule)
     
     """Determine if a remote cloud is needed"""
     if (len(local_servers) == len(schedule)):
@@ -84,17 +84,18 @@ if __name__ == "__main__":
 
 
         """Start up the image on our local cloud"""
-        upload_image.upload(remote_glclient, remote_ksclient, images)
+        #upload_image.upload(remote_glclient, remote_ksclient, images)
+        images.append(upload_image.find_image(remote_glclient))
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1].id.encode('ascii'), "Remote Transburst Server Group", 'remote', len(remote_workload))
 
-        while (not scheduling.transcode_job_complete()):
+        while not scheduling.transcode_job_complete():
             sleep(5)
 
         """Retrieve data from remote cloud"""
         move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
     while not scheduling.transcode_job_complete():
-        sleep(1)
+        sleep(5)
 
     worker_node_init.kill_servers(local_servers)
     worker_node_init.kill_servers(remote_servers)
