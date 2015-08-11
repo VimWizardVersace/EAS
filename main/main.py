@@ -13,9 +13,6 @@ import json
 
 test_deadline = "08/12/2015 16:00:00"
 
-list_of_test_files = ['v1.mkv',
-                      'v2.mkv',]
-
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
                            "OS_PASSWORD": '1ightriseR!',
@@ -23,7 +20,6 @@ test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com
                            "OS_REGION_NAME": 'us-internal-1'}
 
 if __name__ == "__main__":
-    file_pointer = open("transburst.conf", 'r')
     credentials = json.load(open('transburst.json'))
     print "Logging in to "+credentials["OS_AUTH_URL"]+" as "+credentials["OS_USERNAME"]+"..."
 
