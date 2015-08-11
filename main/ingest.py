@@ -31,7 +31,8 @@ def ingest_file(filename, credentials):
 
 def generate_index(filename):
     print 'Generating index for file', filename
-    info = Converter.probe(filename)
+    c = Converter()
+    info = c.probe(filename)
     index = dict()
 
     index['i frames'] = find_num_frames('I', filename)
