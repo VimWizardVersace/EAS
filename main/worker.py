@@ -146,6 +146,7 @@ def grab(sw_client, filename):
 def place(sw_client, filename, container='completed', content_type='video'):
     global log
     log.write('Putting ' + filename + ' in swift')
+    sw_client.put_container(container)
     with open(filename, 'rb') as f:
         sw_client.put_object(container, filename, contents=f,
                              content_type=content_type)
