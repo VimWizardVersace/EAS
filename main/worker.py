@@ -59,6 +59,7 @@ def completed():
 
 
 def grab_thread():
+    print 'Spawning grab thread'
     global grabQ, convertQ, log
 
     log.write('GRAB THREAD: loading credentials\n')
@@ -79,6 +80,7 @@ def grab_thread():
 
 
 def convert_thread():
+    print 'Spawning convert thread'
     global convertQ, placeQ, log
 
     while True:
