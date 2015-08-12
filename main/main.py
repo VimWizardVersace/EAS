@@ -111,5 +111,6 @@ if __name__ == "__main__":
     while not scheduling.transcode_job_complete(nvclient, local_servers):
         sleep(5)
 
-    worker_node_init.kill_servers(local_servers)
+    print "JOB COMPLETE!"
+    #worker_node_init.kill_servers(local_servers)
 
