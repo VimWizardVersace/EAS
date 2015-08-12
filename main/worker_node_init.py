@@ -119,13 +119,15 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 
 
 def is_done_booting(nova_client, server):
-    ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
-    url = 'http://' + ip_address + ':5000/boot'
-    try:
-        get(url)
-        return True
-    except ConnectionError:
-        return False
+    if server.status == 'ACTIVE':
+        ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
+        url = 'http://' + ip_address + ':5000/boot'
+        try:
+            get(url)
+            return True
+        except ConnectionError:
+            pass
+    return False
 
 
 # clean up time
