@@ -31,7 +31,7 @@ def update_status(nova_client, server):
 def post_workload(nova_client, server, workload):
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
-    url = ip_address + ':5000/jobs'
+    url = "http://" + ip_address + ':5000/jobs'
 
     # post request takes a dictionary as argument, {filename: file pointer}
     files_to_upload = {'file': open(workload, 'rb')}
