@@ -32,7 +32,7 @@ def post_workload(nova_client, server, workload):
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
     url = ip_address + ':5000/jobs'
-    
+
     # post request takes a dictionary as argument, {filename: file pointer}
     files_to_upload = {'file': open(workload, 'rb')}
 
@@ -43,7 +43,7 @@ def post_workload(nova_client, server, workload):
 # if such a flavor is not found, begin a recursive search for the closest matching flavor
 def find_flavor(nova_client, RAM=4096, vCPUS=2):
     # upper bound of recursive search
-    if RAM > 262144 || vCPUS > 64:
+    if RAM > 262144 or vCPUS > 64:
         return None
 
     # search for the flavor
