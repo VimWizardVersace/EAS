@@ -50,6 +50,7 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
     for flavor in nova_client.flavors.list():
         if flavor.ram == RAM:
             if flavor.vcpus == vCPUS:
+                print "Flavor found!  Specs: RAM=%d vCPUS=%d" %(RAM ,vCPUS) 
                 return flavor.id.encode("ascii")
     
     # if not found, look for something bigger in RAM or vCPUS
@@ -68,7 +69,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
             # files argument takes a dictionary where keys are destination path and value is the contents of the file
             # on the server, we can create a file called "workload.txt"
             workload = schedule.pop()
-            print "Workload for VM #",len(server_list)+1,":", workload
+            print "Workload for VM #",len(server_list)+1,":", workload,
 
             f = open("workload.txt",'w')
             for video in workload:
