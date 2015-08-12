@@ -31,7 +31,9 @@ def update_status(nova_client, server):
 def post_workload(nova_client, server, workload):
 
     f = open("workload.txt",'r')
-    print f.readlines()
+    print "Contents of workload:"
+    print f.read()
+
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
     url = "http://" + ip_address + ':5000/jobs'
@@ -72,9 +74,11 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
             # on the server, we can create a file called "workload.txt"
             workload = schedule.pop()
             f = open("workload.txt",'w')
+            print "Workload for VM #",len(server_list)+1,":", workload
             for video in workload:
                 f.write(video+'\n')
 
+            f.close()
             # and put that vm's workload in that file.
             server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
 
