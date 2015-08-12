@@ -15,7 +15,7 @@ test_deadline = "08/12/2015 16:00:00"
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
-                           "OS_PASSWORD": '1ightriseR!',
+                           "OS_PASSWORD": '',
                            "OS_TENANT_NAME": 'BXBInternBox' ,
                            "OS_REGION_NAME": 'us-internal-1'}
 
@@ -46,18 +46,25 @@ if __name__ == "__main__":
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
     schedule = scheduling.partition_workload(time_remaining, swclient, "Videos")
 
-    """Start up image on our local cloud"""
     images = []
-    images.append(upload_image.find_image(glclient))
-    remote_workload = []
-    #upload_image.upload(glclient, ksclient, images)
-    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", schedule)
+
+    """Check if our image is already on the cloud, if it isn't, upload it"""
+    image = upload_image.find_image(glclient)
+    if image == None:
+        upload_image.upload(glclient, ksclient, images)
+    else:
+        images.append(image)
+
+    """Start up image on our local cloud"""
+    flavor = worker_node_init.find_flavor(nvclient, RAM=4096, vCPUS=2)
+    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", schedule, flavor)
     
     """Determine if a remote cloud is needed"""
     if (len(local_servers) == len(schedule)):
         local_only = True
 
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
+    remote_workload = []
     else:
         remote_workload = schedule[len(local_servers):]
 
@@ -80,14 +87,23 @@ if __name__ == "__main__":
         move_data.Move_data_to_remote_cloud_OPENSTACK(swclient, remote_swclient, remote_workload)
 
 
-        """Start up the image on our local cloud"""
-        #upload_image.upload(remote_glclient, remote_ksclient, images)
-        images.append(upload_image.find_image(remote_glclient))
+        """Check if our image exists on the remote cloud, if not, upload it"""
+        image = upload_image.find_image(glclient)
+        if image == None:
+            upload_image.upload(glclient, ksclient, images)
+        else:
+            images.append(image)
+
+        """Start up the image on our remote cloud"""
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1].id.encode('ascii'), "Remote Transburst Server Group", 'remote', len(remote_workload))
 
+        """Wait for a signal from the workers saying that they are done"""
         while not scheduling.transcode_job_complete():
             sleep(5)
 
+        """Once the job is complete, kill the servers"""
+        worker_node_init.kill_servers(remote_servers)
+        
         """Retrieve data from remote cloud"""
         move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
@@ -95,5 +111,4 @@ if __name__ == "__main__":
         sleep(5)
 
     worker_node_init.kill_servers(local_servers)
-    worker_node_init.kill_servers(remote_servers)
 

@@ -31,17 +31,32 @@ def update_status(nova_client, server):
 def post_workload(nova_client, server, workload):
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
-
     url = ip_address + ':5000/jobs'
+    
     # post request takes a dictionary as argument, {filename: file pointer}
     files_to_upload = {'file': open(workload, 'rb')}
 
     # make the request using the two variables created above
     post(url, files=files_to_upload)
 
+# search for a flavor that has exactly 4GB of RAM and 2 VCPUS
+# if such a flavor is not found, begin a recursive search for the closest matching flavor
+def find_flavor(nova_client, RAM=4096, vCPUS=2):
+    # upper bound of recursive search
+    if RAM > 262144 || vCPUS > 64:
+        return None
+
+    # search for the flavor
+    for flavor in nova_client.flavors.list():
+        if flavor.ram == RAM:
+            if flavor.vcpus == vCPUS:
+                return flavor.id.encode("ascii")
+    
+    # if not found, look for something bigger in RAM or vCPUS
+    return find_flavor(nova_client, RAM*2, vCPUS) || find_flavor(nova_client, RAM, vCPUS*2)
+
 # keep spamming servers until we run out of room
-#
-def spawn(nova_client, ImageID, ServerName, loc, schedule):
+def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     server_list = []
     print "Spawning transburst servers..."
     while True:
@@ -57,10 +72,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule):
             # files argument takes a dictionary where keys are destination path and value is the contents of the file
             # on the server, we can create a file called "workload.txt"
             # and put that vm's workload in that file.
-            server = activate_image(nova_client, ImageID, "Transburst Server Group", 3)
-
-            # using the rest api, send the workload to the vm.
-            post_workload(nova_client, server, "workload.txt")
+            server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
             
             # keep checking to make sure the server has been booted.
             # if an error state is reached, fall back.
@@ -71,6 +83,8 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule):
                     return server_list
                 continue
 
+            # using the rest api, send the workload to the vm.
+            post_workload(nova_client, server, "workload.txt")
         except exceptions.Forbidden:
             print "Your credentials don't give you access to building servers."
             break
