@@ -2,7 +2,7 @@ import time
 import operator
 import paramiko
 import predictor
-from BeautifulSoup import BeautifulSoup
+import urllib2
 from subprocess import call, PIPE, Popen, check_output
 
 def find_epoch_time_until_deadline(deadline):
