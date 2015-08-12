@@ -36,10 +36,15 @@ def jobs():
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], swift_files))
         log.write('Finished saving files on POST method on /jobs\n')
         fill_grabQ(swift_files)
+
+        log.write('Spawning GRAB THREAD\n')
         Thread(target=grab_thread)
+
+        log.write('Spawning CONVERT THREAD\n')
         Thread(target=convert_thread)
+
+        log.write('Spawning PLACE THREAD\n')
         Thread(target=place_thread)
-        log.write('Finished spawning threads on POST method on /jobs\n')
         return ''
     else:
         log.write('Accessed GET method on /jobs\n')
