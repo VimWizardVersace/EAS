@@ -193,9 +193,11 @@ def convert(filename, config=None):
 
 
 def tar(base):
+    log.write('Writing tar archive as ' + base + '.tar\n')
     archive = tarfile.open(base + '.tar', 'w')
     for filename in os.listdir('.'):
         if base in filename:
+            log.write('Adding ' + filename + ' to tar archive\n')
             archive.add(filename)
             os.remove(filename)
     archive.close()
