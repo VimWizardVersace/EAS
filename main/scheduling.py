@@ -46,7 +46,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
             single_vm_capacity.append(video)
             tmp_t_u_d -= prediction_time
             if (video == file_list[-1]):
-                artitioned_video_list.append(single_vm_capacity)
+                partitioned_video_list.append(single_vm_capacity)
         
         else:
             tmp_t_u_d = time_until_deadline

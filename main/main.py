@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
-    schedule = scheduling.partition_workload(time_remaining, swclient, "Videos")
+    schedule = scheduling.partition_workload(time_remaining, swclient, "videos")
 
     images = []
 
