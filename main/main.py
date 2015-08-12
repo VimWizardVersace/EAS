@@ -3,7 +3,6 @@
 from ingest import ingest
 from time import sleep
 import worker_node_init
-import transburst_utils
 import client_create
 import upload_image
 import scheduling
