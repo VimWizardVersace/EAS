@@ -31,7 +31,9 @@ def update_status(nova_client, server):
 def post_workload(nova_client, server, workload):
 
     f = open("workload.txt",'r')
-    print f.readlines()
+    print "Contents of workload:"
+    print f.read()
+
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
     url = "http://" + ip_address + ':5000/jobs'
