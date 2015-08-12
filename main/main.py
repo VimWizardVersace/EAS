@@ -32,6 +32,7 @@ if __name__ == "__main__":
     remote_ksclient, remote_glclient, remote_nvclient, remote_swclient = None, None, None, None
 
     local_only = False
+    test_deadline = credentials["DEADLINE"]
 
     ##### IMPORTANT STUFF: #####
 
@@ -60,11 +61,11 @@ if __name__ == "__main__":
     local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", schedule, flavor)
     
     """Determine if a remote cloud is needed"""
+    remote_workload = []
     if (len(local_servers) == len(schedule)):
         local_only = True
 
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
-    remote_workload = []
     else:
         remote_workload = schedule[len(local_servers):]
 
