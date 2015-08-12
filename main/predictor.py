@@ -184,7 +184,7 @@ def generate_vec(filename, transcode_config):
            input_info['i frames'],
            input_info['b frames'],
            input_info['p frames'],
-           transcode_config['video']['fps'],
+           float(transcode_config['video']['fps']),
            input_info['width'],
            input_info['height'],
            o_width,
