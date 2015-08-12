@@ -30,7 +30,7 @@ if __name__ == "__main__":
     nvclient = client_create.create_nova_client(credentials)
     remote_ksclient, remote_glclient, remote_nvclient, remote_swclient = None, None, None, None
 
-    local_only = False
+    local_only = True
     test_deadline = credentials["DEADLINE"]
 
     ##### IMPORTANT STUFF: #####
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     """Determine if a remote cloud is needed"""
     remote_workload = []
     if (len(local_servers) == len(schedule)):
-        local_only = True
+        local_only = False
 
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
     else:
