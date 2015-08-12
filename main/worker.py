@@ -183,7 +183,7 @@ def convert(filename, config=None):
     f = ffmpeg.FFMpeg()
 
     # Creates the generator used to convert the file
-    c_gen = f.convert(filename, new_name, new_config)
+    c_gen = f.convert(filename, new_name, new_config, timeout=0)
 
     for c in c_gen:
         pass
