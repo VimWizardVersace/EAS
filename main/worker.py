@@ -59,11 +59,10 @@ def completed():
 
 
 def grab_thread():
-    print 'Spawning grab thread'
     global grabQ, convertQ, log
 
     log.write('GRAB THREAD: loading credentials\n')
-    credentials = json.load(open('transburst.conf'))
+    credentials = json.load(open('transburst.json'))
 
     log.write('GRAB THREAD: spawning swift client\n')
     sw_client = create_swift_client(credentials)
@@ -80,7 +79,6 @@ def grab_thread():
 
 
 def convert_thread():
-    print 'Spawning convert thread'
     global convertQ, placeQ, log
 
     while True:
@@ -98,7 +96,7 @@ def place_thread():
     global placeQ, log
 
     log.write('PLACE THREAD: loading credentials\n')
-    credentials = json.load(open('transburst.conf'))
+    credentials = json.load(open('transburst.json'))
 
     log.write('PLACE THREAD: spawning swift client\n')
     sw_client = create_swift_client(credentials)
