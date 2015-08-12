@@ -53,7 +53,8 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
                 return flavor.id.encode("ascii")
     
     # if not found, look for something bigger in RAM or vCPUS
-    return find_flavor(nova_client, RAM*2, vCPUS) || find_flavor(nova_client, RAM, vCPUS*2)
+    return find_flavor(nova_client, RAM*2, vCPUS) or find_flavor(nova_client,
+                                                                RAM, vCPUS*2)
 
 # keep spamming servers until we run out of room
 def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
