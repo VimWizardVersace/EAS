@@ -21,6 +21,11 @@ def index():
     return redirect(url_for('jobs'))
 
 
+@app.route('/boot')
+def booted():
+    return 'True'
+
+
 @app.route('/jobs', methods=['GET', 'POST'])
 def jobs():
     global log
