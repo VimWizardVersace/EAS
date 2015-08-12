@@ -29,11 +29,6 @@ def update_status(nova_client, server):
 
 # REST api magic
 def post_workload(nova_client, server, workload):
-
-    f = open("workload.txt",'r')
-    print "Contents of workload:"
-    print f.read()
-
     # retrieve ip address of the server for the post request
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
     url = "http://" + ip_address + ':5000/jobs'
@@ -73,8 +68,9 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
             # files argument takes a dictionary where keys are destination path and value is the contents of the file
             # on the server, we can create a file called "workload.txt"
             workload = schedule.pop()
-            f = open("workload.txt",'w')
             print "Workload for VM #",len(server_list)+1,":", workload
+
+            f = open("workload.txt",'w')
             for video in workload:
                 f.write(video+'\n')
 
