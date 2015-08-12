@@ -10,7 +10,7 @@ from keystoneclient.auth.identity import v2
 from glanceclient import Client
 from time import sleep
 from threading import Thread
-from requests import post
+from requests import post, get, ConnectionError
 
 # after the image is uploaded, you will need to boot it with nova
 #
@@ -74,14 +74,16 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 
             # and put that vm's workload in that file.
             server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
-            
+
+
             # keep checking to make sure the server has been booted.
             # if an error state is reached, fall back.
-            while (not is_done_booting(server)):
+            while not is_done_booting(server):
                 server = update_status(nova_client, server)
                 if (server.status == "ERROR"):
                     server.delete()
                     return server_list
+                sleep(2)
 
             # using the rest api, send the workload to the vm.
             post_workload(nova_client, server, "workload.txt")
@@ -116,10 +118,14 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 # checks the server status to see if it's still building  
 #
 def is_done_booting(server):
-    if (server.status == "BUILD"):
-        return False
-    else:
+    ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
+    url = 'http://' + ip_address + ':5000/boot'
+    try:
+        get(url)
         return True
+    except ConnectionError:
+        return False
+
 
 # clean up time
 #
