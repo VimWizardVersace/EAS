@@ -110,7 +110,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
         print "booted %s server #%i" %(loc, len(server_list))
   
         # check to see if we booted enough vms
-        if (len(server_list) == len(schedule)):
+        if (len(schedule) == 0):
             break
 
     return server_list
