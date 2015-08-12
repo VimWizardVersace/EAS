@@ -59,7 +59,7 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
 # keep spamming servers until we run out of room
 def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     server_list = []
-    print "Spawning transburst servers with", flavor.vcpus, "CPUs and", flavor.ram, "ram ..."
+    print "Spawning transburst servers with flavor id", flavor, "..."
     while True:
         try:    
             # reminder: schedule stores a list of list of videos.  each internal list is a seperate workload 
