@@ -8,7 +8,7 @@ import json
 import os
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = '~/tmp'
+app.config['UPLOAD_FOLDER'] = '~/eas/main'
 
 grabQ = Queue()
 convertQ = Queue()
@@ -31,7 +31,7 @@ def jobs():
     global log
     if request.method == 'POST':
         log.write('Accessed POST method on /jobs\n')
-        swift_files = '~/swift_list'
+        swift_files = 'swift_list'
         f = request.files['file']
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], swift_files))
         log.write('Finished saving files on POST method on /jobs\n')
