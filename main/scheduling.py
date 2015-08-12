@@ -59,8 +59,9 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
 def transcode_job_complete(nova_client, server_list):
     for server in server_list:
         ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
-        url = "http://" + ip_address + ':5000/jobs'
+        url = "http://" + ip_address + ':5000/jobs/status'
         website = urllib2.urlopen(url)
+        print website.read()
         if "False" in website.read():
             return False
     return True
