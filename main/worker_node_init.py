@@ -50,7 +50,7 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
     for flavor in nova_client.flavors.list():
         if flavor.ram == RAM:
             if flavor.vcpus == vCPUS:
-                print "Flavor found!  Specs: RAM=%d vCPUS=%d" %(RAM ,vCPUs) 
+                print "Flavor found!  Specs: RAM=%d vCPUS=%d" %(RAM ,vCPUS) 
                 return flavor.id.encode("ascii")
     
     # if not found, look for something bigger in RAM or vCPUS
