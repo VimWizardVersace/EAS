@@ -17,8 +17,9 @@ def upload(glance_client, keystone_client, images):
 def find_image(glance_client):
     image_list = list(glance_client.images.list())
     for image in image_list:
-        if image.name == "worker" or image.name == "raw_convert" or image.name == "master_node":
+        if image.name == "worker":
             return image.id
+    return None       
 
 if __name__ == "__main__":
     OS_AUTH_URL = 'https://us-internal-1.cloud.cisco.com:5000/v2.0'
