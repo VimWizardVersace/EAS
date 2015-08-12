@@ -72,6 +72,8 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
             # on the server, we can create a file called "workload.txt"
             workload = schedule.pop()
             f = open("workload.txt",'w')
+            print workload
+            print schedule
             for video in workload:
                 f.write(video+'\n')
 
