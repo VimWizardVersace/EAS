@@ -207,6 +207,7 @@ def predict(filename, predictor=None, scaler=None, config=None):
 
     vec = generate_vec(filename, config)
     scaled_vec = scaler.transform([vec])[0]
+    print 'Predicted time for', filename, 'is', predictor.predict(scaled_vec)[0]
     return predictor.predict(scaled_vec)[0]
 
 
