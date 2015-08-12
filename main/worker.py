@@ -180,8 +180,10 @@ def convert(filename, config=None):
     if 'size' in config['video']:
         new_config += ['-s', config['video']['size']]
 
+    f = ffmpeg.FFMpeg()
+
     # Creates the generator used to convert the file
-    c_gen = ffmpeg.FFMpeg().convert(filename, new_name, new_config)
+    c_gen = f.convert(filename, new_name, new_config)
 
     for c in c_gen:
         pass
