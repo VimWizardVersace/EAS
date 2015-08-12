@@ -13,6 +13,7 @@ app.config['UPLOAD_FOLDER'] = '~/tmp'
 grabQ = Queue()
 convertQ = Queue()
 placeQ = Queue()
+log = open('log.txt', 'r+')
 
 
 @app.route('/')
@@ -22,61 +23,89 @@ def index():
 
 @app.route('/jobs', methods=['GET', 'POST'])
 def jobs():
+    global log
     if request.method == 'POST':
+        log.write('Accessed POST method on /jobs')
         swift_files = '~/swift_list'
         f = request.files['file']
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], swift_files))
-
+        log.write('Finished saving files on POST method on /jobs')
         fill_grabQ(swift_files)
         Thread(target=grab_thread)
         Thread(target=convert_thread)
         Thread(target=place_thread)
+        log.write('Finished spawning threads on POST method on /jobs')
         return ''
     else:
+        log.write('Accessed GET method on /jobs')
         return print_all_queues()
 
 
 @app.route('/jobs/status')
 def completed():
+    global log
+    log.write('Accessed /jobs/status')
     return str(grabQ.empty() and convertQ.empty() and placeQ.empty())
 
 
 def grab_thread():
-    global grabQ, convertQ
+    global grabQ, convertQ, log
 
+    log.write('GRAB THREAD: loading credentials')
     credentials = json.load(open('transburst.conf'))
+
+    log.write('GRAB THREAD: spawning swift client')
     sw_client = create_swift_client(credentials)
 
     while True:
+        log.write('GRAB THREAD: listening in grab queue')
         filename = grabQ.get()
+
+        log.write('GRAB THREAD: grabbing ' + filename + ' from swift')
         grab(sw_client, filename)
+
+        log.write('GRAB THREAD: putting ' + filename + ' in convert queue')
         convertQ.put(filename)
 
 
 def convert_thread():
-    global convertQ, placeQ
+    global convertQ, placeQ, log
 
     while True:
+        log.write('CONVERT THREAD: listening on convert queue')
         filename = convertQ.get()
+
+        log.write('CONVERT THREAD: converting ' + filename)
         new_name = convert(filename)
+
+        log.write('CONVERT THREAD: putting' + filename + ' in place queue')
         placeQ.put(new_name)
 
 
 def place_thread():
-    global placeQ
+    global placeQ, log
 
+    log.write('PLACE THREAD: loading credentials')
     credentials = json.load(open('transburst.conf'))
+
+    log.write('PLACE THREAD: spawning swift client')
     sw_client = create_swift_client(credentials)
 
     while True:
+        log.write('PLACE THREAD: listening on place queue')
         filename = placeQ.get()
+
+        log.write('PLACE THREAD: placing ' + filename + ' back in swift')
         place(sw_client, filename)
 
 
 def fill_grabQ(swift_urls):
-    global grabQ
+    global grabQ, log
+
+    log.write('Filling grab queue')
     with open(swift_urls, 'r+') as swift_url_list:
         for line in swift_url_list.readlines():
+            log.write('Adding ' + line.strip() + ' to grab queue')
             grabQ.put(line.strip())
 
 
