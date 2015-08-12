@@ -10,7 +10,10 @@ def find_epoch_time_until_deadline(deadline):
     #
     try:
         pattern = "%m/%d/%Y %H:%M:%S"
-        epoch = int(time.mktime(time.strptime(deadline, pattern)))  
+        epoch = int(time.mktime(time.strptime(deadline, pattern)))
+        print epoch
+        print time.time()
+        print epoch - time.time()  
         return epoch - time.time()
     except (ValueError):
         print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
