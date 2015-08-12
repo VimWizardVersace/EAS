@@ -1,5 +1,5 @@
 from client_create import create_swift_client
-from flask import Flask, request
+from flask import *
 from threading import Thread
 from converter import ffmpeg
 from Queue import Queue
@@ -13,6 +13,11 @@ app.config['UPLOAD_FOLDER'] = '~/tmp'
 grabQ = Queue()
 convertQ = Queue()
 placeQ = Queue()
+
+
+@app.route('/')
+def index():
+    return redirect(url_for('jobs'))
 
 
 @app.route('/jobs', methods=['GET', 'POST'])
