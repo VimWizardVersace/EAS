@@ -10,7 +10,7 @@ import move_data
 import json
 
 
-test_deadline = "08/13/2015 16:00:00"
+test_deadline = "08/12/2015 19:15:00"
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
