@@ -113,6 +113,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
         if (len(schedule) == 0):
             break
 
+    print "Total servers needed:  ",len(server_list)
     return server_list
 
 # checks the server status to see if it's still building
