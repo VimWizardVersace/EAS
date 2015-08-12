@@ -198,6 +198,7 @@ def tar(base):
         if base in filename:
             archive.add(filename)
             os.remove(filename)
+    archive.close()
     return base + '.tar'
 
 
