@@ -8,7 +8,7 @@ import json
 import os
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = '~/eas/main'
+app.config['UPLOAD_FOLDER'] = '/home/interns/eas/main'
 
 grabQ = Queue()
 convertQ = Queue()
