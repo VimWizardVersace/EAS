@@ -78,7 +78,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 
             # keep checking to make sure the server has been booted.
             # if an error state is reached, fall back.
-            while not is_done_booting(server):
+            while not is_done_booting(nova_client, server):
                 server = update_status(nova_client, server)
                 if (server.status == "ERROR"):
                     server.delete()
@@ -115,9 +115,10 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 
     return server_list
 
-# checks the server status to see if it's still building  
-#
-def is_done_booting(server):
+# checks the server status to see if it's still building
+
+
+def is_done_booting(nova_client, server):
     ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
     url = 'http://' + ip_address + ':5000/boot'
     try:
