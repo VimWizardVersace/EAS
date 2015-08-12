@@ -30,7 +30,7 @@ if __name__ == "__main__":
     nvclient = client_create.create_nova_client(credentials)
     remote_ksclient, remote_glclient, remote_nvclient, remote_swclient = None, None, None, None
 
-    local_only = False
+    local_only = True
     test_deadline = credentials["DEADLINE"]
 
     ##### IMPORTANT STUFF: #####
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     """Determine if a remote cloud is needed"""
     remote_workload = []
     if (len(local_servers) == len(schedule)):
-        local_only = True
+        local_only = False
 
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
     else:
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1].id.encode('ascii'), "Remote Transburst Server Group", 'remote', len(remote_workload))
 
         """Wait for a signal from the workers saying that they are done"""
-        while not scheduling.transcode_job_complete():
+        while not scheduling.transcode_job_complete(nvclient, remote_servers):
             sleep(5)
 
         """Once the job is complete, kill the servers"""
@@ -107,7 +107,8 @@ if __name__ == "__main__":
         """Retrieve data from remote cloud"""
         move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
 
-    while not scheduling.transcode_job_complete():
+    print "Waiting for response from worker nodes..."
+    while not scheduling.transcode_job_complete(nvclient, local_servers):
         sleep(5)
 
     worker_node_init.kill_servers(local_servers)

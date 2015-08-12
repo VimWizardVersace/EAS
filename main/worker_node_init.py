@@ -113,6 +113,9 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
         if (len(schedule) == 0):
             break
 
+    print "Total servers needed:",len(server_list)
+    print "Total vCPUs needed:",len(server_list)*2
+    print "Total RAM consumed:",len(server_list)*4096
     return server_list
 
 # checks the server status to see if it's still building
