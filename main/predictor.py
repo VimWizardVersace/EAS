@@ -180,7 +180,7 @@ def generate_vec(filename, transcode_config):
     o_height = int(o_size.split('x')[0])
 
     vec = [input_info['duration'],
-           float(input_info['fps']),
+           input_info['fps'],
            input_info['i frames'],
            input_info['b frames'],
            input_info['p frames'],
