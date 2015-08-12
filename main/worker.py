@@ -38,13 +38,13 @@ def jobs():
         fill_grabQ(swift_files)
 
         log.write('Spawning GRAB THREAD\n')
-        Thread(target=grab_thread)
+        Thread(target=grab_thread).start()
 
         log.write('Spawning CONVERT THREAD\n')
-        Thread(target=convert_thread)
+        Thread(target=convert_thread).start()
 
         log.write('Spawning PLACE THREAD\n')
-        Thread(target=place_thread)
+        Thread(target=place_thread).start()
         return ''
     else:
         log.write('Accessed GET method on /jobs\n')
