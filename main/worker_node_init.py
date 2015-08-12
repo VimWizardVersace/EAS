@@ -59,19 +59,19 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
 # keep spamming servers until we run out of room
 def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     server_list = []
-    print "Spawning transburst servers with flavor id", flavor, "..."
+    print "Spawning transburst servers with flavor id", flavor,"..."
     while True:
         try:    
             # reminder: schedule stores a list of list of videos.  each internal list is a seperate workload 
             # for each vm.  
             # each time we go through this loop for each VM, the workload will be different.
+            # files argument takes a dictionary where keys are destination path and value is the contents of the file
+            # on the server, we can create a file called "workload.txt"
             workload = schedule.pop()
             f = open("workload.txt",'w')
             for video in workload:
                 f.write(video+'\n')
 
-            # files argument takes a dictionary where keys are destination path and value is the contents of the file
-            # on the server, we can create a file called "workload.txt"
             # and put that vm's workload in that file.
             server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
             
@@ -82,7 +82,6 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
                 if (server.status == "ERROR"):
                     server.delete()
                     return server_list
-                continue
 
             # using the rest api, send the workload to the vm.
             post_workload(nova_client, server, "workload.txt")
