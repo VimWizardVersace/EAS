@@ -135,7 +135,7 @@ def grab(sw_client, filename):
 
     # reminder: sw_client.get_object returns a tuple in the form of:
     # (filename, file content)
-    vid_tuple = sw_client.get_object("Videos", filename)
+    vid_tuple = sw_client.get_object('videos', filename)
 
     # finally, write a file to the local directory with the same name as the
     # file we are retrieving
