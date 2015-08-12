@@ -13,7 +13,7 @@ app.config['UPLOAD_FOLDER'] = '~/tmp'
 grabQ = Queue()
 convertQ = Queue()
 placeQ = Queue()
-log = open('log.txt', 'r+')
+log = open('log.txt', 'a+')
 
 
 @app.route('/')
@@ -21,7 +21,7 @@ def index():
     return redirect(url_for('jobs'))
 
 
-@app.route('/boot')
+@app.route('/boot', methods=['GET'])
 def booted():
     return 'True'
 
