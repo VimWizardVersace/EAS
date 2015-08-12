@@ -72,11 +72,11 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
             # on the server, we can create a file called "workload.txt"
             workload = schedule.pop()
             f = open("workload.txt",'w')
-            print workload
-            print schedule
+            print "Workload for VM #",len(server_list)+1,":", workload
             for video in workload:
                 f.write(video+'\n')
 
+            f.close()
             # and put that vm's workload in that file.
             server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
 
