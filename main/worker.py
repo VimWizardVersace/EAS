@@ -1,4 +1,3 @@
-from transburst_utils import parse_config_file
 from client_create import create_swift_client
 from flask import Flask, request
 from threading import Thread
@@ -40,7 +39,7 @@ def completed():
 def grab_thread():
     global grabQ, convertQ
 
-    credentials = parse_config_file('transburst.conf')
+    credentials = json.load(open('transburst.conf'))
     sw_client = create_swift_client(credentials)
 
     while True:
@@ -61,7 +60,7 @@ def convert_thread():
 def place_thread():
     global placeQ
 
-    credentials = parse_config_file('transburst.conf')
+    credentials = json.load(open('transburst.conf'))
     sw_client = create_swift_client(credentials)
 
     while True:

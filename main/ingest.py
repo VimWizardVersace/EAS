@@ -10,7 +10,7 @@ def find_num_frames(frame_type, filename):
     Valid frame_types are 'I', 'P', and 'B'.
     """
     print 'Finding number of', frame_type, 'frames for', filename
-    return 10
+    return 10fair enough
     command = ('ffprobe -loglevel quiet -show_frames ' + filename + ' | ' +
                'grep pict_type=' + frame_type + ' | wc -l')
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
