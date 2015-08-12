@@ -137,7 +137,8 @@ def is_done_booting(nova_client, server):
 # clean up time
 #
 def kill_servers(server_list):
-    for server in server_list:
+    for index, server in enumerate(server_list):
+        print "Destroying server #"+str(index+1)
         server.delete()
 
 
