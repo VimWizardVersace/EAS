@@ -88,7 +88,7 @@ def convert_thread():
         log.write('CONVERT THREAD: converting ' + filename + '\n')
         new_name = convert(filename)
 
-        log.write('CONVERT THREAD: putting' + filename + ' in place queue\n')
+        log.write('CONVERT THREAD: putting ' + new_name + ' in place queue\n')
         placeQ.put(new_name)
 
 
@@ -197,9 +197,8 @@ def tar(base):
     archive = tarfile.open(base + '.tar', 'w')
     for filename in os.listdir('.'):
         if base in filename:
-            log.write('Adding ' + filename + ' to tar archive\n')
+            log.write('Adding ' + filename + ' to ' + base + '.tar\n')
             archive.add(filename)
-            os.remove(filename)
     archive.close()
     return base + '.tar'
 
