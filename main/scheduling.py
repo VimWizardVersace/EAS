@@ -61,8 +61,7 @@ def transcode_job_complete(nova_client, server_list):
         ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
         url = "http://" + ip_address + ':5000/jobs/status'
         website = urllib2.urlopen(url)
-        print website.read()
-        if "False" in website.read():
+        if "False" == website.read().strip():
             return False
     return True
 
