@@ -55,6 +55,9 @@ def jobs():
 def completed():
     global log
     log.write('Accessed /jobs/status\n')
+    log.write('Grab Queue: ' + str(list(grabQ.queue)))
+    log.write('Convert Queue: ' + str(list(convertQ.queue)))
+    log.write('Place Queue: ' + str(list(placeQ.queue)))
     return str(grabQ.empty() and convertQ.empty() and placeQ.empty())
 
 
