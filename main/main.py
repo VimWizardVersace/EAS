@@ -107,6 +107,7 @@ if __name__ == "__main__":
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', remote_schedule, flavor)
 
         """Wait for a signal from the workers saying that they are done"""
+        print "Waiting for completion signal..."
         while not scheduling.transcode_job_complete(remote_nvclient, remote_servers,
                                                     'remote'):
             sleep(5)
@@ -114,7 +115,7 @@ if __name__ == "__main__":
         """Once the job is complete, kill the servers"""
         worker_node_init.kill_servers(remote_servers)
 
-    print "Waiting for response from worker nodes..."
+    print "Waiting for completion signal from local nodes..."
     while not scheduling.transcode_job_complete(nvclient, local_servers,
                                                 'local'):
         sleep(5)
