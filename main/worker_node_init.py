@@ -92,7 +92,6 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num, s
         post_workload(nova_client, server, "workload.txt")
     except exceptions.Forbidden:
         print "Your credentials don't give you access to building servers."
-        break
 
     except exceptions.RateLimit:
         print "Rate limit reached"
@@ -106,7 +105,6 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num, s
 
     except (exceptions.ClientException, exceptions.OverLimit) as e:
         print "Local cloud resource quota reached"
-        break
 
     # it's probably a good idea to keep these servers stored somewhere easily accessible    
     server_list.append(server)
