@@ -14,7 +14,7 @@ test_deadline = "08/12/2015 20:00:00"
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
-                           "OS_PASSWORD": '',
+                           "OS_PASSWORD": '1ightriseR!',
                            "OS_TENANT_NAME": 'BXBInternBox' ,
                            "OS_REGION_NAME": 'us-internal-1'}
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     """Start up image on our local cloud"""
     flavor = worker_node_init.find_flavor(nvclient, RAM=4096, vCPUS=2)
-    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", schedule, flavor)
+    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", [], flavor)
     
     """Determine if a remote cloud is needed"""
     remote_workload = []
