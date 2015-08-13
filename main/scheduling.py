@@ -65,7 +65,6 @@ def partition_workload(time_until_deadline, swiftclient, container_name, file_li
             partitioned_video_list.append(single_vm_capacity)
             single_vm_capacity = []
 
-    print partitioned_video_list
     return partitioned_video_list
 
 

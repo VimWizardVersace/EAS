@@ -121,5 +121,5 @@ if __name__ == "__main__":
 
     print "JOB COMPLETE!"
     move_data.retrieve_data_from_local_cloud(swclient)
-    worker_node_init.kill_servers(local_servers)
+    #worker_node_init.kill_servers(local_servers)
 
