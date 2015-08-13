@@ -134,6 +134,8 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     for thread in thread_list:
         thread.join()
 
+    print "Threads joined.  All servers done booting."
+
     print "Total servers needed:", len(server_list)
     print "Total vCPUs needed:", len(server_list) * 2
     print "Total RAM consumed:", len(server_list) * 4096
