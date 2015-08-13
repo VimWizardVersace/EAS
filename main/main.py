@@ -39,9 +39,6 @@ if __name__ == "__main__":
     # FUNCTIONS THAT ARE COMMENTED OUT ARE NOT COMPLETE #
     #####################################################
 
-    """For testing purposes, move a couple of test videos to our local cloud before doing anything"""
-   #move_data.Move_data_to_local_cloud(swclient, list_of_test_files, container="Videos")
-
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
     schedule = scheduling.partition_workload(time_remaining, swclient, "videos")
@@ -69,7 +66,6 @@ if __name__ == "__main__":
 
     print "Predicted number of instances needed on local cloud: ", len(local_servers)
     print "Predicted number of instances needed on remote cloud: ", len(remote_workload)
-
     remote_servers = []
     if (not local_only):
         """Given a deadline, workload, and a collection of data, determine
@@ -88,31 +84,35 @@ if __name__ == "__main__":
 
         print "Moving data to remote cloud..."
         """Using that cloud's api, move the video files to that cloud"""
-        move_data.Move_data_to_remote_cloud_OPENSTACK(swclient, remote_swclient, remote_workload)
+        move_data.Move_data_to_remote_cloud_OPENSTACK(remote_workload, swclient, remote_swclient)
 
 
         """Check if our image exists on the remote cloud, if not, upload it"""
-        image = upload_image.find_image(glclient)
+        image = upload_image.find_image(remote_glclient)
         if image == None:
-            upload_image.upload(glclient, ksclient, images)
+            upload_image.upload(remote_glclient, remote_ksclient, images)
         else:
             print "Image found on remote cloud!"
             images.append(image)
 
+        """Find remote schedule"""
+        remote_list = [video for sublist in remote_workload for video in sublist]
+        time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
+        remote_schedule = scheduling.partition_workload(time_remaining, remote_swclient, "videos", file_list=remote_list)
 
+        print "NEW: ", time_remaining
+        print "NEW SCHEDULE: ", remote_schedule
         """Start up the image on our remote cloud"""
-        remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', len(remote_workload))
+        flavor = worker_node_init.find_flavor(remote_nvclient, RAM=4096, vCPUS=2)
+        remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', remote_schedule, flavor)
 
         """Wait for a signal from the workers saying that they are done"""
-        while not scheduling.transcode_job_complete(nvclient, remote_servers,
+        while not scheduling.transcode_job_complete(remote_nvclient, remote_servers,
                                                     'remote'):
             sleep(5)
 
         """Once the job is complete, kill the servers"""
-        #worker_node_init.kill_servers(remote_servers)
-        
-        """Retrieve data from remote cloud"""
-        move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
+        worker_node_init.kill_servers(remote_servers)
 
     print "Waiting for response from worker nodes..."
     while not scheduling.transcode_job_complete(nvclient, local_servers,
@@ -120,5 +120,5 @@ if __name__ == "__main__":
         sleep(5)
 
     print "JOB COMPLETE!"
-    #worker_node_init.kill_servers(local_servers)
+    worker_node_init.kill_servers(local_servers)
 

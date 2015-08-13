@@ -33,7 +33,8 @@ def update_status(nova_client, server):
 # REST api magic
 def post_workload(nova_client, server, workload, loc):
     # retrieve ip address of the server for the post request
-    ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode(
+    addr_keys = nova_client.servers.ips(server).keys()[0]
+    ip_address = nova_client.servers.ips(server)[addr_keys][0]['addr'].encode(
         'ascii')
     url = "http://" + ip_address + ':5000/jobs'
     if loc == 'local':
@@ -103,6 +104,7 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
         post_workload(nova_client, server, "workload.txt", loc)
     except exceptions.Forbidden:
         print "Your credentials don't give you access to building servers."
+        return
 
     except exceptions.RateLimit:
         print "Rate limit reached"
@@ -112,9 +114,11 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
         sleep(1)
         print"1..."
         sleep(1)
+        return
 
     except (exceptions.ClientException, exceptions.OverLimit) as e:
         print "Local cloud resource quota reached"
+        return
 
     # it's probably a good idea to keep these servers stored somewhere easily accessible    
     server_list.append(server)
@@ -149,7 +153,8 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 
 def is_done_booting(nova_client, server, loc):
     if server.status == 'ACTIVE':
-        ip_address = nova_client.servers.ips(server)['private'][0][
+        addr_keys = nova_client.servers.ips(server).keys()[0]
+        ip_address = nova_client.servers.ips(server)[addr_keys][0][
             'addr'].encode('ascii')
         url = 'http://' + ip_address + ':5000/boot'
         if loc == 'local':
