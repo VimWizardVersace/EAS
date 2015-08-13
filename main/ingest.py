@@ -9,7 +9,6 @@ def find_num_frames(frame_type, filename):
     """Find and return the number of frames of a given type
     Valid frame_types are 'I', 'P', and 'B'.
     """
-    return 300
     print 'Finding number of', frame_type, 'frames for', filename
     command = ('ffprobe -loglevel quiet -show_frames ' + filename + ' | ' +
                'grep pict_type=' + frame_type + ' | wc -l')
