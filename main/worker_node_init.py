@@ -131,7 +131,7 @@ def is_done_booting(nova_client, server):
         url = 'http://' + ip_address + ':5000/boot'
         try:
             get(url)
-            print 'Server ' + ip_address + ' is listening on port 5000'
+            print '\nServer ' + ip_address + ' is listening on port 5000'
             return True
         except ConnectionError:
             pass
