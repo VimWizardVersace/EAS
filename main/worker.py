@@ -16,7 +16,8 @@ grabQ = Queue()
 convertQ = Queue()
 placeQ = Queue()
 log = open('log.txt', 'a+')
-
+num_total = 0
+num_processed = 0
 
 @app.route('/')
 def index():
@@ -55,12 +56,12 @@ def jobs():
 
 @app.route('/jobs/status')
 def completed():
-    global log
+    global log, num_processed, num_total
     log.write('Accessed /jobs/status\n')
-    log.write('Grab Queue: ' + str(list(grabQ.queue)))
-    log.write('Convert Queue: ' + str(list(convertQ.queue)))
-    log.write('Place Queue: ' + str(list(placeQ.queue)))
-    return str(grabQ.empty() and convertQ.empty() and placeQ.empty())
+    # log.write('Grab Queue: ' + str(list(grabQ.queue)))
+    # log.write('Convert Queue: ' + str(list(convertQ.queue)))
+    # log.write('Place Queue: ' + str(list(placeQ.queue)))
+    return str(num_processed == num_total)
 
 
 def return_time():
@@ -107,7 +108,7 @@ def convert_thread():
 
 
 def place_thread():
-    global placeQ, log
+    global placeQ, log, num_processed, num_total
 
     log.write('PLACE THREAD: loading credentials\n')
     credentials = json.load(open('transburst.json'))
@@ -123,16 +124,18 @@ def place_thread():
         log.write('PLACE THREAD: placing ' + filename + ' back in swift @ '
                   + return_time() + '\n')
         place(sw_client, filename)
+        num_processed += 1
 
 
 def fill_grabQ(swift_urls):
-    global grabQ, log
+    global grabQ, log, num_total
 
     log.write('Filling grab queue\n')
     with open(swift_urls, 'r+') as swift_url_list:
         for line in swift_url_list.readlines():
             log.write('Adding ' + line.strip() + ' to grab queue\n')
             grabQ.put(line.strip())
+    num_total = grabQ.qsize()
 
 
 def read_config(config_file='config.json'):
@@ -161,7 +164,6 @@ def grab(sw_client, filename):
 
 def place(sw_client, filename, container='completed', content_type='video'):
     global log
-    log.write('Putting ' + filename + ' in swift\n')
     sw_client.put_container(container)
     with open(filename, 'rb') as f:
         sw_client.put_object(container, filename, contents=f,
