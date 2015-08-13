@@ -10,6 +10,7 @@ from glanceclient import Client
 from time import sleep
 from threading import Thread
 from requests import post, get, ConnectionError
+from hackurl import hackurl
 
 
 # after the image is uploaded, you will need to boot it with nova
@@ -30,12 +31,14 @@ def update_status(nova_client, server):
 
 
 # REST api magic
-def post_workload(nova_client, server, workload):
+def post_workload(nova_client, server, workload, loc):
     # retrieve ip address of the server for the post request
     addr_keys = nova_client.servers.ips(server).keys()[0]
     ip_address = nova_client.servers.ips(server)[addr_keys][0]['addr'].encode(
         'ascii')
     url = "http://" + ip_address + ':5000/jobs'
+    if loc == 'local':
+        url = hackurl(url)
 
     # post request takes a dictionary as argument, {filename: file pointer}
     files_to_upload = {'file': open(workload, 'rb')}
@@ -98,7 +101,7 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
         f.close()
 
         # using the rest api, send the workload to the vm.
-        post_workload(nova_client, server, "workload.txt")
+        post_workload(nova_client, server, "workload.txt", loc)
     except exceptions.Forbidden:
         print "Your credentials don't give you access to building servers."
         return

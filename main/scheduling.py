@@ -2,6 +2,7 @@ import time
 import urllib2
 
 import predictor
+from hackurl import hackurl
 
 
 def find_epoch_time_until_deadline(deadline):
@@ -67,13 +68,14 @@ def partition_workload(time_until_deadline, swiftclient, container_name, file_li
     return partitioned_video_list
 
 
-def transcode_job_complete(nova_client, server_list):
-    print len(server_list)
+def transcode_job_complete(nova_client, server_list, loc):
     for index, server in enumerate(server_list):
         addr_keys = nova_client.servers.ips(server).keys()[0]
         ip_address = nova_client.servers.ips(server)[addr_keys][0][
             'addr'].encode('ascii')
         url = "http://" + ip_address + ':5000/jobs/status'
+        if loc == 'local':
+            url = hackurl(url)
         website = urllib2.urlopen(url)
         if "False" == website.read().strip():
             return False

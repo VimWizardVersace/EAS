@@ -12,11 +12,11 @@ import move_data
 
 test_deadline = "08/12/2015 20:00:00"
 
-test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
-                           "OS_USERNAME": 'rumadera',
-                           "OS_PASSWORD": '1ightriseR!',
-                           "OS_TENANT_NAME": 'BXBInternBox' ,
-                           "OS_REGION_NAME": 'us-internal-1'}
+remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
+                       "OS_USERNAME": 'rumadera',
+                       "OS_PASSWORD": '1ightriseR!',
+                       "OS_TENANT_NAME": 'BXBInternBox' ,
+                       "OS_REGION_NAME": 'us-internal-1'}
 
 if __name__ == "__main__":
     credentials = json.load(open('transburst.json'))
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         """Given a deadline, workload, and a collection of data, determine
          which cloud to outsource to"""
         # remote_credentials = find_optimal_cloud(deadline, work_load_outsourced)        
-        remote_credentials = test_remote_credentials
+
         print "Logging in to "+remote_credentials["OS_AUTH_URL"]+" as "+remote_credentials["OS_USERNAME"]+"..."
 
         """(ASSUMING THE OPTIMAL CLOUD RUNS OPENSTACK) Given credentials, 
@@ -107,14 +107,16 @@ if __name__ == "__main__":
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', remote_schedule, flavor)
 
         """Wait for a signal from the workers saying that they are done"""
-        while not scheduling.transcode_job_complete(remote_nvclient, remote_servers):
+        while not scheduling.transcode_job_complete(remote_nvclient, remote_servers,
+                                                    'remote'):
             sleep(5)
 
         """Once the job is complete, kill the servers"""
         worker_node_init.kill_servers(remote_servers)
 
     print "Waiting for response from worker nodes..."
-    while not scheduling.transcode_job_complete(nvclient, local_servers):
+    while not scheduling.transcode_job_complete(nvclient, local_servers,
+                                                'local'):
         sleep(5)
 
     print "JOB COMPLETE!"
