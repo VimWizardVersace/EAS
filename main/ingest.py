@@ -29,7 +29,7 @@ def ingest_file(filename, credentials):
     print 'Ingesting file', filename
     index = generate_index(filename)
     write_index(filename, index)
-    # swift_move(filename, credentials)
+    swift_move(filename, credentials)
 
 
 def generate_index(filename):
