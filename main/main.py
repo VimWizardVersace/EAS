@@ -10,7 +10,7 @@ import move_data
 import json
 
 
-test_deadline = "08/12/2015 19:55:00"
+test_deadline = "08/12/2015 20:00:00"
 
 test_remote_credentials = {"OS_AUTH_URL": "https://us-internal-1.cloud.cisco.com:5000/v2.0",
                            "OS_USERNAME": 'rumadera',
@@ -44,7 +44,6 @@ if __name__ == "__main__":
 
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
-    print time_remaining
     schedule = scheduling.partition_workload(time_remaining, swclient, "videos")
     print "Predicted number of instances needed: ",len(schedule)
 
