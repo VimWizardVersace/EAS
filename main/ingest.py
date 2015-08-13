@@ -1,6 +1,7 @@
 import subprocess
 import json
 import os
+import sys
 from converter import Converter
 from client_create import create_swift_client
 
@@ -16,7 +17,7 @@ def find_num_frames(frame_type, filename):
     return int(process.stdout.read())
 
 
-def ingest(credentials, directory='.'):
+def ingest(credentials, directory):
     print 'Beginning ingest'
     for filename in os.listdir(directory):
         if filename.endswith('.mp4') or filename.endswith('.mkv'):
@@ -28,7 +29,7 @@ def ingest_file(filename, credentials):
     print 'Ingesting file', filename
     index = generate_index(filename)
     write_index(filename, index)
-    swift_move(filename, credentials)
+    # swift_move(filename, credentials)
 
 
 def generate_index(filename):
@@ -83,5 +84,8 @@ def write_index(filename, index, index_filename='index.json'):
 if __name__ == '__main__':
     with open('transburst.json', 'r') as cred_file:
         credentials = json.load(cred_file)
-    ingest(credentials)
-    print forwarding_dict()
+    if len(sys.argv) > 1:
+        directory = sys.argv[1]
+    else:
+        directory = '.'
+    ingest(credentials, directory)

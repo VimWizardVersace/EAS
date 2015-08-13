@@ -15,7 +15,7 @@ def find_epoch_time_until_deadline(deadline):
             raise Exception("Negative deadline")
         return epoch - time.time()
     except (ValueError):
-        print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
+        print "Deadline required to be of form: MM/DD/YYYY HH:MM:SS"
     except Exception as e:
         print e
         return 1
@@ -33,7 +33,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name, file_li
         try:
             file_list = [token[0] for token in container_data]
         except IndexError:
-            print "error (IndexError): container empty?"
+            print "IndexError: Container empty"
 
     
     # where we store the partitioned list of videos.
@@ -43,7 +43,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name, file_li
     # given a time-until-completetion by joe's look up table, we keep decrementing "time_until_deadline" by 
     # these times until it reaches zero, then, create a new list (representing a new vm), and repeat. 
     tmp_t_u_d = time_until_deadline
-    print "time left: ", time_until_deadline
+    print "Time Remaining: ", time_until_deadline
     single_vm_capacity = []
     for video in file_list:
         single_vm_capacity.append(video)
