@@ -62,11 +62,9 @@ if __name__ == "__main__":
     
     """Determine if a remote cloud is needed"""
     remote_workload = []
-    if (len(local_servers) == len(schedule)):
-        local_only = False
-
+    if (len(local_servers) < len(schedule)):
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
-    else:
+        local_only = False
         remote_workload = schedule[len(local_servers):]
 
     print "Predicted number of instances needed on local cloud: ", len(local_servers)
