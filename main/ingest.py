@@ -9,7 +9,6 @@ def find_num_frames(frame_type, filename):
     """Find and return the number of frames of a given type
     Valid frame_types are 'I', 'P', and 'B'.
     """
-    return 250
     print 'Finding number of', frame_type, 'frames for', filename
     command = ('ffprobe -loglevel quiet -show_frames ' + filename + ' | ' +
                'grep pict_type=' + frame_type + ' | wc -l')
@@ -82,7 +81,7 @@ def write_index(filename, index, index_filename='index.json'):
 
 
 if __name__ == '__main__':
-    # with open('transburst.json', 'r') as cred_file:
-    #     credentials = json.load(cred_file)
-    # ingest(credentials)
+    with open('transburst.json', 'r') as cred_file:
+        credentials = json.load(cred_file)
+    ingest(credentials)
     print forwarding_dict()
