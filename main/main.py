@@ -74,8 +74,9 @@ if __name__ == "__main__":
     if (not local_only):
         """Given a deadline, workload, and a collection of data, determine
          which cloud to outsource to"""
-        # remote_credentials = find_optimal_cloud(deadline, work_load_outsourced)
+        # remote_credentials = find_optimal_cloud(deadline, work_load_outsourced)        
         remote_credentials = test_remote_credentials
+        print "Logging in to "+remote_credentials["OS_AUTH_URL"]+" as "+remote_credentials["OS_USERNAME"]+"..."
 
         """(ASSUMING THE OPTIMAL CLOUD RUNS OPENSTACK) Given credentials, 
         spawn a new client keystone client so that we may have permission to move files around"""
@@ -85,6 +86,7 @@ if __name__ == "__main__":
         remote_nvclient = client_create.create_nova_client(remote_credentials)
         remote_swclient = client_create.create_swift_client(remote_credentials)
 
+        print "Moving data to remote cloud..."
         """Using that cloud's api, move the video files to that cloud"""
         move_data.Move_data_to_remote_cloud_OPENSTACK(swclient, remote_swclient, remote_workload)
 
@@ -94,17 +96,19 @@ if __name__ == "__main__":
         if image == None:
             upload_image.upload(glclient, ksclient, images)
         else:
+            print "Image found on remote cloud!"
             images.append(image)
 
+
         """Start up the image on our remote cloud"""
-        remote_servers = worker_node_init.spawn(remote_nvclient, images[1].id.encode('ascii'), "Remote Transburst Server Group", 'remote', len(remote_workload))
+        remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', len(remote_workload))
 
         """Wait for a signal from the workers saying that they are done"""
         while not scheduling.transcode_job_complete(nvclient, remote_servers):
             sleep(5)
 
         """Once the job is complete, kill the servers"""
-        worker_node_init.kill_servers(remote_servers)
+        #worker_node_init.kill_servers(remote_servers)
         
         """Retrieve data from remote cloud"""
         move_data.retrieve_data_from_remote_cloud_OPENSTACK(swclient, remote_swclient)
