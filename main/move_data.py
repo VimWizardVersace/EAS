@@ -36,15 +36,17 @@ def Move_data_to_remote_cloud_OPENSTACK(ListOfFiles, swift_client,
                                         remote_swift_client):
     remote_swift_client.put_container("videos")
     print "\"videos\" container created on remote cloud"
-    for f in ListOfFiles:
-        print "Moving %s to remote cloud..."
-        f_contents = open(f, 'rb')
-        remote_swift_client.put_object("videos", f, contents=f_contents,
-                                       content_type="Video/mp4")
+    for schedule in ListOfFiles:
+        for f in schedule:
+            print "Moving %s to remote cloud..." %f
+            f_contents = open(f, 'rb')
+            remote_swift_client.put_object("videos", f, contents=f_contents,
+                                           content_type="Video/mp4")
 
 
 def Retrieve_data_from_remote_cloud_OPENSTACK(swift_client,
                                               remote_swift_client):
+    container_data = []
     for data in remote_swift_client.get_container("completed")[1]:
         container_data.append('{0}'.format(data['name']))
     for f in container_data:
