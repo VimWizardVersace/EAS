@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     """Start up image on our local cloud"""
     flavor = worker_node_init.find_flavor(nvclient, RAM=4096, vCPUS=2)
-    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", [], flavor)
+    local_servers = worker_node_init.spawn(nvclient, images[0], "Local Transburt Server Group", "local", schedule, flavor)
     
     """Determine if a remote cloud is needed"""
     remote_workload = []
@@ -100,8 +100,7 @@ if __name__ == "__main__":
         time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
         remote_schedule = scheduling.partition_workload(time_remaining, remote_swclient, "videos", file_list=remote_list)
 
-        print "NEW: ", time_remaining
-        print "NEW SCHEDULE: ", remote_schedule
+        print "Number of remote instances needed: (course corrected)",len(remote_schedule)
         """Start up the image on our remote cloud"""
         flavor = worker_node_init.find_flavor(remote_nvclient, RAM=4096, vCPUS=2)
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', remote_schedule, flavor)
