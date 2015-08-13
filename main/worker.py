@@ -1,13 +1,14 @@
-from client_create import create_swift_client
-from flask import *
 from threading import Thread
-from converter import ffmpeg
 from Queue import Queue
 import datetime
 import tarfile
-import json
 import time
 import os
+
+from flask import *
+from converter import ffmpeg
+
+from client_create import create_swift_client
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/home/interns/eas/main'
@@ -18,6 +19,7 @@ placeQ = Queue()
 log = open('log.txt', 'a+')
 num_total = 0
 num_processed = 0
+
 
 @app.route('/')
 def index():

@@ -1,14 +1,14 @@
 # main.py
 
-from ingest import ingest
 from time import sleep
+import json
+
+from ingest import ingest
 import worker_node_init
 import client_create
 import upload_image
 import scheduling
 import move_data
-import json
-
 
 test_deadline = "08/12/2015 20:00:00"
 
