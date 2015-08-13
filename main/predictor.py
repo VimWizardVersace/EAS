@@ -196,6 +196,11 @@ def generate_vec(filename, transcode_config):
     return vec
 
 
+def prettify_time(num_seconds):
+    time_est = int(ceil(num_seconds/10.)) * 10
+    return time.strftime('%-M minutes %-S seconds', time.gmtime(time_est))
+
+
 def predict(filename, predictor=None, scaler=None, config=None):
     """ Makes a prediction of based off unscaled data passed to the
     function, loading the predictor and scaler from files if none are
@@ -210,11 +215,10 @@ def predict(filename, predictor=None, scaler=None, config=None):
 
     vec = generate_vec(filename, config)
     scaled_vec = scaler.transform([vec])[0]
-    time_float = predictor.predict(scaled_vec)[0]
-    time_est = int(ceil(time_float/10.)) * 10
-    time_str = time.strftime('%-M minutes %-S seconds', time.gmtime(time_est))
-    print 'Predicted transcode time for', filename, 'is about', time_str
-    return time_float
+    time_est = predictor.predict(scaled_vec)[0]
+    print 'Predicted transcode time for', filename, 'is about', \
+        prettify_time(time_est)
+    return time_est
 
 
 # Running this file will train a predictor based off the training data found in
