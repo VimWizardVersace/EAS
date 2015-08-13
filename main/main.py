@@ -120,5 +120,6 @@ if __name__ == "__main__":
         sleep(5)
 
     print "JOB COMPLETE!"
+    move_data.retrieve_data_from_local_cloud(swclient)
     worker_node_init.kill_servers(local_servers)
 
