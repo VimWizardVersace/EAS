@@ -58,9 +58,8 @@ def jobs():
 def completed():
     global log, num_processed, num_total
     log.write('Accessed /jobs/status\n')
-    # log.write('Grab Queue: ' + str(list(grabQ.queue)))
-    # log.write('Convert Queue: ' + str(list(convertQ.queue)))
-    # log.write('Place Queue: ' + str(list(placeQ.queue)))
+    log.write('num_processed = ' + str(num_processed) + '\n')
+    log.write('num_total = ' + str(num_total) + '\n')
     return str(num_processed == num_total)
 
 
