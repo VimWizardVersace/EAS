@@ -42,7 +42,8 @@ if __name__ == "__main__":
     """Determine what can be done in the alloted time"""
     time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
     schedule = scheduling.partition_workload(time_remaining, swclient, "videos")
-    print "Predicted number of instances needed: ",len(schedule)
+    num_instances = len(schedule)
+    print "Predicted number of instances needed: ",num_instances
 
     images = []
 
@@ -59,10 +60,10 @@ if __name__ == "__main__":
     
     """Determine if a remote cloud is needed"""
     remote_workload = []
-    if (len(local_servers) < len(schedule)):
+    if (len(local_servers) < num_instances):
     # if we can't fit all the workload on the local cloud, send the remaining workload to the remote cloud 
         local_only = False
-        remote_workload = schedule[len(local_servers):]
+        remote_workload = schedule
 
     print "Predicted number of instances needed on local cloud: ", len(local_servers)
     print "Predicted number of instances needed on remote cloud: ", len(remote_workload)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
         time_remaining = scheduling.find_epoch_time_until_deadline(test_deadline)
         remote_schedule = scheduling.partition_workload(time_remaining, remote_swclient, "videos", file_list=remote_list)
 
-        print "Number of remote instances needed: (course corrected)",len(remote_schedule)
+        print "Number of remote instances needed (course corrected): ",len(remote_schedule)
         """Start up the image on our remote cloud"""
         flavor = worker_node_init.find_flavor(remote_nvclient, RAM=4096, vCPUS=2)
         remote_servers = worker_node_init.spawn(remote_nvclient, images[1], "Remote Transburst Server Group", 'remote', remote_schedule, flavor)
