@@ -11,9 +11,13 @@ def find_epoch_time_until_deadline(deadline):
     try:
         pattern = "%m/%d/%Y %H:%M:%S"
         epoch = int(time.mktime(time.strptime(deadline, pattern)))  
+        if (epoch < time.time()):
+            raise Exception("Negative deadline")
         return epoch - time.time()
     except (ValueError):
         print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
+    except Exception as e:
+        print e
 
 def partition_workload(time_until_deadline, swiftclient, container_name):
     container_data = []
