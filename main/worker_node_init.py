@@ -58,7 +58,7 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
                                                                 RAM, vCPUS*2)
 
 def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num, server_list):
-    print "Spawning transburst servers with flavor id", flavor,"..."
+    print "Spawning transburst server with flavor id", flavor,"..."
     try:    
         # and put that vm's workload in that file.
         server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
