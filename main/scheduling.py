@@ -1,16 +1,15 @@
 import time
-import operator
-import paramiko
-import predictor
 import urllib2
-from subprocess import call, PIPE, Popen, check_output
+
+import predictor
+
 
 def find_epoch_time_until_deadline(deadline):
-    #WARNING:  Time must be formatted the same as pattern
+    # WARNING:  Time must be formatted the same as pattern
     #
     try:
         pattern = "%m/%d/%Y %H:%M:%S"
-        epoch = int(time.mktime(time.strptime(deadline, pattern)))  
+        epoch = int(time.mktime(time.strptime(deadline, pattern)))
         if (epoch < time.time()):
             raise Exception("Negative deadline")
         return epoch - time.time()
@@ -18,6 +17,7 @@ def find_epoch_time_until_deadline(deadline):
         print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
     except Exception as e:
         print e
+
 
 def partition_workload(time_until_deadline, swiftclient, container_name):
     container_data = []
@@ -31,7 +31,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
         file_list = [token[0] for token in container_data]
     except IndexError:
         print "error (IndexError): container empty?"
-    
+
     print file_list
     # where we store the partitioned list of videos.
     # Internal lists seperate what is possible to transcode in time on one VM
@@ -56,7 +56,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
             tmp_t_u_d -= prediction_time
             if (video == file_list[-1]):
                 partitioned_video_list.append(single_vm_capacity)
-        
+
         else:
             tmp_t_u_d = time_until_deadline
             partitioned_video_list.append(single_vm_capacity)
@@ -68,12 +68,10 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
 
 def transcode_job_complete(nova_client, server_list):
     for server in server_list:
-        ip_address = nova_client.servers.ips(server)['private'][0]['addr'].encode('ascii')
+        ip_address = nova_client.servers.ips(server)['private'][0][
+            'addr'].encode('ascii')
         url = "http://" + ip_address + ':5000/jobs/status'
         website = urllib2.urlopen(url)
         if "False" == website.read().strip():
             return False
     return True
-
-
-

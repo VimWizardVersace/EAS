@@ -1,11 +1,12 @@
 from sklearn.externals import joblib
 from sklearn import preprocessing
 from sklearn import grid_search
-from ingest import read_index
 from sklearn import svm
 import json
 import csv
 import os
+
+from ingest import read_index
 
 
 def parse_data(file_name):
