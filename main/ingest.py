@@ -84,4 +84,3 @@ if __name__ == '__main__':
     with open('transburst.json', 'r') as cred_file:
         credentials = json.load(cred_file)
     ingest(credentials)
-    print forwarding_dict()
