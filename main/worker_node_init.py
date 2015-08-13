@@ -78,7 +78,7 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
 
         # keep checking to make sure the server has been booted.
         # if an error state is reached, fall back.
-        while not is_done_booting(nova_client, server):
+        while not is_done_booting(nova_client, server, loc):
             server = update_status(nova_client, server)
             if (server.status == "ERROR"):
                 server.delete()
@@ -151,12 +151,14 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
 # checks the server status to see if it's still building
 
 
-def is_done_booting(nova_client, server):
+def is_done_booting(nova_client, server, loc):
     if server.status == 'ACTIVE':
         addr_keys = nova_client.servers.ips(server).keys()[0]
         ip_address = nova_client.servers.ips(server)[addr_keys][0][
             'addr'].encode('ascii')
         url = 'http://' + ip_address + ':5000/boot'
+        if loc == 'local':
+            url = hackurl(url)
         try:
             get(url)
             print 'Server ' + ip_address + ' is listening on port 5000'
