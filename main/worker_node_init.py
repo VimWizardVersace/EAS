@@ -57,65 +57,75 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
     return find_flavor(nova_client, RAM*2, vCPUS) or find_flavor(nova_client,
                                                                 RAM, vCPUS*2)
 
+def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num, server_list):
+    print "Spawning transburst servers with flavor id", flavor,"..."
+    try:    
+        # and put that vm's workload in that file.
+        server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
+
+
+        # keep checking to make sure the server has been booted.
+        # if an error state is reached, fall back.
+        while not is_done_booting(nova_client, server):
+            server = update_status(nova_client, server)
+            if (server.status == "ERROR"):
+                server.delete()
+                return server_list
+            sleep(2)
+
+
+        # reminder: schedule stores a list of list of videos.  each internal list is a seperate workload 
+        # for each vm.  
+        # each time we go through this loop for each VM, the workload will be different.
+        # files argument takes a dictionary where keys are destination path and value is the contents of the file
+        # on the server, we can create a file called "workload.txt"
+        workload = schedule.pop(0)
+        print "Workload for VM #",num,":", workload,
+
+        f = open("workload.txt",'w')
+        for video in workload:
+            f.write(video+'\n')
+
+        f.close()
+
+        # using the rest api, send the workload to the vm.
+        post_workload(nova_client, server, "workload.txt")
+    except exceptions.Forbidden:
+        print "Your credentials don't give you access to building servers."
+        break
+
+    except exceptions.RateLimit:
+        print "Rate limit reached"
+        print "3..."
+        sleep(1)
+        print "2..."
+        sleep(1)
+        print"1..."
+        sleep(1)
+        continue
+
+    except (exceptions.ClientException, exceptions.OverLimit) as e:
+        print "Local cloud resource quota reached"
+        break
+
+    # it's probably a good idea to keep these servers stored somewhere easily accessible    
+    server_list.append(server)
+    print "booted %s server #%i" %(loc, len(server_list))
+
 # keep spamming servers until we run out of room
 def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     server_list = []
-    print "Spawning transburst servers with flavor id", flavor,"..."
-    while True:
-        try:    
-            # reminder: schedule stores a list of list of videos.  each internal list is a seperate workload 
-            # for each vm.  
-            # each time we go through this loop for each VM, the workload will be different.
-            # files argument takes a dictionary where keys are destination path and value is the contents of the file
-            # on the server, we can create a file called "workload.txt"
-            workload = schedule.pop(0)
-            print "Workload for VM #",len(server_list)+1,":", workload,
-
-            f = open("workload.txt",'w')
-            for video in workload:
-                f.write(video+'\n')
-
-            f.close()
-            # and put that vm's workload in that file.
-            server = activate_image(nova_client, ImageID, "Transburst Server Group", flavor)
-
-
-            # keep checking to make sure the server has been booted.
-            # if an error state is reached, fall back.
-            while not is_done_booting(nova_client, server):
-                server = update_status(nova_client, server)
-                if (server.status == "ERROR"):
-                    server.delete()
-                    return server_list
-                sleep(2)
-
-            # using the rest api, send the workload to the vm.
-            post_workload(nova_client, server, "workload.txt")
-        except exceptions.Forbidden:
-            print "Your credentials don't give you access to building servers."
-            break
-
-        except exceptions.RateLimit:
-            print "Rate limit reached"
-            print "3..."
-            sleep(1)
-            print "2..."
-            sleep(1)
-            print"1..."
-            sleep(1)
-            continue
-
-        except (exceptions.ClientException, exceptions.OverLimit) as e:
-            print "Local cloud resource quota reached"
-            break
-
-        # it's probably a good idea to keep these servers stored somewhere easily accessible    
-        server_list.append(server)
-        print "booted %s server #%i" %(loc, len(server_list))
-  
+    max_num_instances = len(schedule)
+    thread_list = []
+    for i in range(0,max_num_instances):
+        server_init_thread = Thread(target=spawn_helper,
+                                    args=(nova_client, ImageID, ServerName, loc, schedule, flavor, num, server_list))
+        thread_list.append(server_init_thread)
+        thread_list[-1].start()
         # check to see if we booted enough vms
-        if (len(schedule) == 0):
-            break
+
+    for thread in thread_list:
+        thread.join()
 
     print "Total servers needed:",len(server_list)
     print "Total vCPUs needed:",len(server_list)*2
