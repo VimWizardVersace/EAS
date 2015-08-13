@@ -69,6 +69,8 @@ if __name__ == "__main__":
     else:
         remote_workload = schedule[len(local_servers):]
 
+    print "Predicted number of instances needed on remote cloud: ", len(remote_workload)
+
     remote_servers = []
     if (not local_only):
         """Given a deadline, workload, and a collection of data, determine
