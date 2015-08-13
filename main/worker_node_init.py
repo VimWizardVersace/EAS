@@ -68,7 +68,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
             # each time we go through this loop for each VM, the workload will be different.
             # files argument takes a dictionary where keys are destination path and value is the contents of the file
             # on the server, we can create a file called "workload.txt"
-            workload = schedule.pop()
+            workload = schedule.pop(0)
             print "Workload for VM #",len(server_list)+1,":", workload,
 
             f = open("workload.txt",'w')
