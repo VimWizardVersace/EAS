@@ -103,7 +103,8 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
         # using the rest api, send the workload to the vm.
         post_workload(nova_client, server, "workload.txt", loc)
     except exceptions.Forbidden:
-        print "Your credentials don't give you access to building servers."
+        print "Your credentials don't give you access to build any more servers here."
+        print "This instance will be launched on the remote cloud instead: #",num
         return
 
     except exceptions.RateLimit:
