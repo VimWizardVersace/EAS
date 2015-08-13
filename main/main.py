@@ -3,7 +3,6 @@
 from time import sleep
 import json
 
-from ingest import ingest
 import worker_node_init
 import client_create
 import upload_image
