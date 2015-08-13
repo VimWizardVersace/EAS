@@ -39,20 +39,19 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
     print "time left: ", time_until_deadline
     single_vm_capacity = []
     for video in file_list:
-        print video, single_vm_capacity
+        single_vm_capacity.append(video)
         prediction_time = predictor.predict(video)
         if (prediction_time > time_until_deadline):
             print "WARNING:  One of the files is too big to be transcoded by a VM in time.  Maybe cut it up into chunks and reupload it."
-        
+            tmp_t_u_d -= prediction_time
+            continue
+
         if (tmp_t_u_d - prediction_time > 0):
-            single_vm_capacity.append(video)
             tmp_t_u_d -= prediction_time
             if (video == file_list[-1]):
-                print "appended"
                 partitioned_video_list.append(single_vm_capacity)
         
         else:
-            print "appended"
             tmp_t_u_d = time_until_deadline
             partitioned_video_list.append(single_vm_capacity)
             single_vm_capacity = []
