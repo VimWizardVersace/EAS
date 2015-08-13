@@ -71,7 +71,6 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
 def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
                  server_list):
     # print "Spawning transburst server with flavor id", flavor, "..."
-    print "Spawning transburst server..."
     try:
         # and put that vm's workload in that file.
         server = activate_image(nova_client, ImageID, "Transburst Server Group",
@@ -134,6 +133,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     max_num_instances = len(schedule)
     thread_list = []
     for i in range(0, max_num_instances):
+        print "Spawning %s transburst server #%d..." %(loc, i)
         server_init_thread = Thread(target=spawn_helper,
                                     args=(nova_client, ImageID, ServerName, loc,
                                           schedule, flavor, i, server_list))
