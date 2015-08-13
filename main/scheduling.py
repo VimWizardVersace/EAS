@@ -18,6 +18,7 @@ def find_epoch_time_until_deadline(deadline):
         print "bruh give us a deadline in the form of MM/DD/YYYY HH:MM:SS"
     except Exception as e:
         print e
+        return 1
 
 
 def partition_workload(time_until_deadline, swiftclient, container_name, file_list = None):
