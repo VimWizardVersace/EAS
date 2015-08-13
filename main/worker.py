@@ -3,8 +3,10 @@ from flask import *
 from threading import Thread
 from converter import ffmpeg
 from Queue import Queue
+import datetime
 import tarfile
 import json
+import time
 import os
 
 app = Flask(__name__)
@@ -61,6 +63,11 @@ def completed():
     return str(grabQ.empty() and convertQ.empty() and placeQ.empty())
 
 
+def return_time():
+    ts = time.time()
+    return datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+
+
 def grab_thread():
     global grabQ, convertQ, log
 
@@ -74,10 +81,12 @@ def grab_thread():
         log.write('GRAB THREAD: listening in grab queue\n')
         filename = grabQ.get()
 
-        log.write('GRAB THREAD: grabbing ' + filename + ' from swift\n')
+        log.write('GRAB THREAD: grabbing ' + filename + ' from swift @ ' +
+                  return_time() + '\n')
         grab(sw_client, filename)
 
-        log.write('GRAB THREAD: putting ' + filename + ' in convert queue\n')
+        log.write('GRAB THREAD: putting ' + filename + ' in convert queue @ ' +
+                  return_time() + '\n')
         convertQ.put(filename)
 
 
@@ -88,10 +97,12 @@ def convert_thread():
         log.write('CONVERT THREAD: listening on convert queue\n')
         filename = convertQ.get()
 
-        log.write('CONVERT THREAD: converting ' + filename + '\n')
+        log.write('CONVERT THREAD: converting ' + filename + ' @ ' +
+                  return_time() + '\n')
         new_name = convert(filename)
 
-        log.write('CONVERT THREAD: putting ' + new_name + ' in place queue\n')
+        log.write('CONVERT THREAD: putting ' + new_name + ' in place queue @ '
+                  + return_time() + '\n')
         placeQ.put(new_name)
 
 
@@ -105,10 +116,12 @@ def place_thread():
     sw_client = create_swift_client(credentials)
 
     while True:
-        log.write('PLACE THREAD: listening on place queue\n')
+        log.write('PLACE THREAD: listening on place queue @ ' + return_time()
+                  + '\n')
         filename = placeQ.get()
 
-        log.write('PLACE THREAD: placing ' + filename + ' back in swift\n')
+        log.write('PLACE THREAD: placing ' + filename + ' back in swift @ '
+                  + return_time() + '\n')
         place(sw_client, filename)
 
 
