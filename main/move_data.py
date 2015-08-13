@@ -27,6 +27,16 @@ def Move_data_to_local_cloud(swift_client, ListOfFiles, container="videos"):
         thread.join()
     print "Done uploading to LOCAL cloud..."
 
+def retrieve_data_from_local_cloud(swift_client):
+    container_data = []
+    for data in swift_client.get_container("completed")[1]:
+        container_data.append('{0}'.format(data['name']))
+    for f in container_data:
+        print "Downloading %s to local drive..." %f
+        obj_tuple = swift_client.get_object('completed', f)
+        with open(f, 'wb') as xcode_bytes:
+            xcode_bytes.write(obj_tuple[1])
+
 
 # Move_data_from_local_cloud_OPENSTACK is the function we run on the local cloud
 # to move data from our cisco cloud to some remote cloud running openstack
@@ -51,7 +61,7 @@ def Retrieve_data_from_remote_cloud_OPENSTACK(swift_client,
         container_data.append('{0}'.format(data['name']))
     for f in container_data:
         with open(f, "rb") as xcode_bytes:
-            swift_client.put_object("Completed", f, contents=xcode_bytes)
+            swift_client.put_object("completed", f, contents=xcode_bytes)
 
 
 if __name__ == "__main__":
