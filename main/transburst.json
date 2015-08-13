@@ -1,6 +1,6 @@
 {
   "STORAGE_URL": "videos",
-  "DEADLINE": "8/12/2015 22:00:00",
+  "DEADLINE": "8/12/2015 22:15:00",
   "OS_AUTH_URL": "http://172.29.74.183:35357/v2.0",
   "OS_USERNAME": "admin",
   "OS_PASSWORD": "light",
