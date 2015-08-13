@@ -69,7 +69,8 @@ def find_flavor(nova_client, RAM=4096, vCPUS=2):
 
 def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
                  server_list):
-    print "Spawning transburst server with flavor id", flavor, "..."
+    # print "Spawning transburst server with flavor id", flavor, "..."
+    print "Spawning transburst server..."
     try:
         # and put that vm's workload in that file.
         server = activate_image(nova_client, ImageID, "Transburst Server Group",
@@ -103,8 +104,8 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
         # using the rest api, send the workload to the vm.
         post_workload(nova_client, server, "workload.txt", loc)
     except exceptions.Forbidden:
-        print "Your credentials don't give you access to build any more servers here."
-        print "This instance will be launched on the remote cloud instead: #",num
+        print "Your credentials don't give access to build more servers here."
+        print "This instance will be launched on the remote cloud #", num
         return
 
     except exceptions.RateLimit:
@@ -118,12 +119,12 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num,
         return
 
     except (exceptions.ClientException, exceptions.OverLimit) as e:
-        print "Local cloud resource quota reached"
+        print "Local cloud resource quota reached."
         return
 
     # it's probably a good idea to keep these servers stored somewhere easily accessible    
     server_list.append(server)
-    print "booted %s server #%i" % (loc, len(server_list))
+    print "Booted %s server #%i" % (loc, len(server_list))
 
 
 # keep spamming servers until we run out of room
@@ -142,7 +143,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     for thread in thread_list:
         thread.join()
 
-    print "Threads joined.  All servers done booting."
+    print "All servers done booting. Listening on port 5000."
     print "Total servers needed:", len(server_list)
     print "Total vCPUs needed:", len(server_list) * 2
     print "Total RAM consumed:", len(server_list) * 4096
@@ -162,7 +163,7 @@ def is_done_booting(nova_client, server, loc):
             url = hackurl(url)
         try:
             get(url)
-            print 'Server ' + ip_address + ' is listening on port 5000'
+            print ip_address + ' is done booting. REST API listening.'
             return True
         except ConnectionError:
             pass
@@ -173,7 +174,7 @@ def is_done_booting(nova_client, server, loc):
 #
 def kill_servers(server_list):
     for index, server in enumerate(server_list):
-        print "Destroying server #" + str(index + 1)
+        print "Destroying server " + str(index + 1)
         server.delete()
 
 

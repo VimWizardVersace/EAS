@@ -2,6 +2,8 @@ from sklearn.externals import joblib
 from sklearn import preprocessing
 from sklearn import grid_search
 from sklearn import svm
+from math import ceil
+import time
 import json
 import csv
 import os
@@ -208,8 +210,11 @@ def predict(filename, predictor=None, scaler=None, config=None):
 
     vec = generate_vec(filename, config)
     scaled_vec = scaler.transform([vec])[0]
-    print 'Predicted time for', filename, 'is', predictor.predict(scaled_vec)[0]
-    return predictor.predict(scaled_vec)[0]
+    time_float = predictor.predict(scaled_vec)[0]
+    time_est = str(int(ceil(time_float/10.)) * 10) + 's'
+    time_str = time.strftime('%-M minutes %-S seconds', time.gmtime(time_est))
+    print 'Predicted transcode time for', filename, 'is about', time_str
+    return time_float
 
 
 # Running this file will train a predictor based off the training data found in
