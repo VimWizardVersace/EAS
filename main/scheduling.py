@@ -19,20 +19,21 @@ def find_epoch_time_until_deadline(deadline):
         print e
 
 
-def partition_workload(time_until_deadline, swiftclient, container_name):
-    container_data = []
-    for data in swiftclient.get_container(container_name)[1]:
-        container_data.append('{0}\t{1}'.format(data['name'], data['bytes']))
-    container_data = [token.split('\t') for token in container_data]
+def partition_workload(time_until_deadline, swiftclient, container_name, file_list = None):
+    if not file_list: 
+        container_data = []
+        for data in swiftclient.get_container(container_name)[1]:
+            container_data.append('{0}\t{1}'.format(data['name'], data['bytes']))
+        container_data = [token.split('\t') for token in container_data]
 
-    # use a list comprehension to create a list of all the filenames
-    file_list = []
-    try:
-        file_list = [token[0] for token in container_data]
-    except IndexError:
-        print "error (IndexError): container empty?"
+        # use a list comprehension to create a list of all the filenames
+        file_list = []
+        try:
+            file_list = [token[0] for token in container_data]
+        except IndexError:
+            print "error (IndexError): container empty?"
 
-    print file_list
+    
     # where we store the partitioned list of videos.
     # Internal lists seperate what is possible to transcode in time on one VM
     partitioned_video_list = []
@@ -69,7 +70,8 @@ def partition_workload(time_until_deadline, swiftclient, container_name):
 def transcode_job_complete(nova_client, server_list):
     print len(server_list)
     for index, server in enumerate(server_list):
-        ip_address = nova_client.servers.ips(server)['private'][0][
+        addr_keys = nova_client.servers.ips(server).keys()[0]
+        ip_address = nova_client.servers.ips(server)[addr_keys][0][
             'addr'].encode('ascii')
         url = "http://" + ip_address + ':5000/jobs/status'
         website = urllib2.urlopen(url)
