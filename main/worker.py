@@ -4,10 +4,8 @@ import datetime
 import tarfile
 import time
 import os
-
 from flask import *
 from converter import ffmpeg
-
 from client_create import create_swift_client
 
 app = Flask(__name__)
