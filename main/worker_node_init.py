@@ -101,7 +101,6 @@ def spawn_helper(nova_client, ImageID, ServerName, loc, schedule, flavor, num, s
         sleep(1)
         print"1..."
         sleep(1)
-        continue
 
     except (exceptions.ClientException, exceptions.OverLimit) as e:
         print "Local cloud resource quota reached"
@@ -117,7 +116,7 @@ def spawn(nova_client, ImageID, ServerName, loc, schedule, flavor):
     thread_list = []
     for i in range(0,max_num_instances):
         server_init_thread = Thread(target=spawn_helper,
-                                    args=(nova_client, ImageID, ServerName, loc, schedule, flavor, num, server_list))
+                                    args=(nova_client, ImageID, ServerName, loc, schedule, flavor, i, server_list))
         thread_list.append(server_init_thread)
         thread_list[-1].start()
         # check to see if we booted enough vms
