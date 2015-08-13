@@ -27,25 +27,17 @@ def Move_data_to_local_cloud(swift_client, ListOfFiles, container="videos"):
         thread.join()
     print "Done uploading to LOCAL cloud..."
 
-def upload_workload_split(swift_client, local_files, remote_files):
-    with open("remote_workload.txt", 'w') as f:
-        for clip in remote_files:
-            f.write(clip+'\n')
-        swift_client.put_object("Videos", "remote_workload.txt" , contents= f.read())
-
-    with open("local_workload.txt", 'w') as f:
-        for clip in local_files:
-            f.write(clip+'\n')
-        swift_client.put_object("Videos", "local_workload.txt" , contents= f.read())
-
 # Move_data_from_local_cloud_OPENSTACK is the function we run on the local cloud 
 # to move data from our cisco cloud to some remote cloud running openstack
 # Note, we must be supplied with the appropriate authentication of the cloud to work
 #
 def Move_data_to_remote_cloud_OPENSTACK(ListOfFiles, swift_client, remote_swift_client):
+    remote_swift_client.put_container("videos")
+    print "\"videos\" container created on remote cloud"
     for f in ListOfFiles:
-        f_tuple = swift_client.get_object("Videos", f)
-        remote_swift_client.put_object("Videos", f, contents=f_tuple[1], content_type="Video")
+        print "Moving %s to remote cloud..."
+        f_contents = open(f, 'rb')
+        remote_swift_client.put_object("videos", f, contents=f_contents, content_type="Video/mp4")
 
 def Retrieve_data_from_remote_cloud_OPENSTACK(swift_client, remote_swift_client):
     for data in remote_swift_client.get_container("completed")[1]:
