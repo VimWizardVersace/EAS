@@ -49,7 +49,7 @@ def partition_workload(time_until_deadline, swiftclient, container_name, file_li
         single_vm_capacity.append(video)
         prediction_time = predictor.predict(video)
         if (prediction_time > time_until_deadline):
-            print "WARNING:  ONE OF THE FILES (%s) IS TOO BIG TO BE TRANSCODED IN TIME. YOU MAY NOT REACH THE DEADLINE. Maybe cut it up into chunks and reupload it." %video
+            print "WARNING:  File is too big to be transcoded by VM in time."
             partitioned_video_list.append(single_vm_capacity)
             single_vm_capacity = []
             tmp_t_u_d -= prediction_time
