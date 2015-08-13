@@ -22,7 +22,7 @@ if __name__ == "__main__":
     credentials = json.load(open('transburst.json'))
     print "Logging in to "+credentials["OS_AUTH_URL"]+" as "+credentials["OS_USERNAME"]+"..."
 
-    ingest(credentials)
+    # ingest(credentials)
 
     ksclient = client_create.create_keystone_client(credentials)
     glclient = client_create.create_glance_client(ksclient)
