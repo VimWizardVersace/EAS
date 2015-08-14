@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
         print "Moving data to remote cloud..."
         """Using that cloud's api, move the video files to that cloud"""
-        move_data.Move_data_to_remote_cloud_OPENSTACK(remote_workload, swclient, remote_swclient)
+        #move_data.Move_data_to_remote_cloud_OPENSTACK(remote_workload, swclient, remote_swclient)
 
 
         """Check if our image exists on the remote cloud, if not, upload it"""
@@ -121,5 +121,5 @@ if __name__ == "__main__":
 
     print "JOB COMPLETE!"
     move_data.retrieve_data_from_local_cloud(swclient)
-    #worker_node_init.kill_servers(local_servers)
+    worker_node_init.kill_servers(local_servers)
 
